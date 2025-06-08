@@ -1,0 +1,320 @@
+:root {
+    --primary: #FF7043;
+    --primary-light: #FF9E7D;
+    --light-bg: #F8F8F8;
+    --card-bg: #FFFFFF;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-light: #999999;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --border-radius: 16px;
+    --placeholder-bg: #f0f0f0;
+    --placeholder-text: #d0d0d0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 100vh;
+}
+
+.container {
+    padding-bottom: 70px;
+}
+
+/* 顶部栏 */
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 20px;
+    background-color: var(--card-bg);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: var(--shadow);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.search-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 广场内容区域 */
+.square-container {
+    padding: 15px;
+}
+
+.feed-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.feed-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.feed-tab.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.feed-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.feed-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s;
+}
+
+.feed-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    background-color: var(--placeholder-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--placeholder-text);
+    overflow: hidden;
+}
+
+.card-info {
+    padding: 12px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    background-color: var(--placeholder-bg);
+    height: 20px;
+    border-radius: 4px;
+}
+
+.card-title:nth-child(2) {
+    width: 80%;
+    margin-top: 8px;
+}
+
+.card-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--placeholder-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--placeholder-text);
+}
+
+.user-name {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background-color: var(--placeholder-bg);
+    height: 16px;
+    width: 80px;
+    border-radius: 4px;
+}
+
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--placeholder-bg);
+    height: 16px;
+    width: 50px;
+    border-radius: 4px;
+}
+
+/* 底部导航 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-light);
+    width: 60px;
+    text-decoration: none;
+}
+
+.nav-item.active {
+    color: var(--primary);
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+/* 加载更多 */
+.load-more {
+    text-align: center;
+    padding: 20px;
+}
+
+.load-btn {
+    padding: 10px 25px;
+    background-color: var(--card-bg);
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.load-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feed-card {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+.feed-card:nth-child(1) { animation-delay: 0.1s; }
+.feed-card:nth-child(2) { animation-delay: 0.2s; }
+.feed-card:nth-child(3) { animation-delay: 0.3s; }
+.feed-card:nth-child(4) { animation-delay: 0.4s; }
+.feed-card:nth-child(5) { animation-delay: 0.5s; }
+.feed-card:nth-child(6) { animation-delay: 0.6s; }
+.feed-card:nth-child(7) { animation-delay: 0.7s; }
+.feed-card:nth-child(8) { animation-delay: 0.8s; }
+
+/* 瀑布流高度变化 */
+.feed-card:nth-child(odd) .card-image {
+    height: 180px;
+}
+
+.feed-card:nth-child(even) .card-image {
+    height: 220px;
+}
+
+.feed-card:nth-child(3n) .card-image {
+    height: 250px;
+}
+
+.feed-card:nth-child(4n) .card-image {
+    height: 160px;
+}
+
+.feed-card:nth-child(5n) .card-image {
+    height: 240px;
+}
+
+.feed-card:nth-child(6n) .card-image {
+    height: 200px;
+}
