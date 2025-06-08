@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息提醒 - 谷鸽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF7043;
+            --primary-light: #FF9E7D;
+            --light-bg: #F8F8F8;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+            --notification: #FF5252;
+            --unread-bg: #e8f4ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }     
+        .container {
+            padding-bottom: 70px;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 20px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 15px;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 顶部右侧按钮容器 */
+        .top-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-left: auto;
+        }
+        
+        /* 顶部按钮样式 */
+        .top-action-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .top-action-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .top-action-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 消息提醒徽章 */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 9px;
+            background-color: var(--notification);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        /* 消息列表 */
+        .notification-list {
+            padding: 20px;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .notification-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .mark-read {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* 消息分类标签 */
+        .notification-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .notification-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .notification-tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .notification-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .notification-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .notification-item.unread {
+            background-color: var(--unread-bg);
+        }
+        
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--primary);
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex-grow: 1;
+        }
+        
+        .notification-title-item {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .notification-unread-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--notification);
+            margin-left: 8px;
+        }
+        
+        .notification-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            background-color: #f0f0f0;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .action-btn.primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background-color: #e05a38;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .top-bar {
+                padding: 10px 15px;
+            }
+            .logo-text {
+                font-size: 18px;
+            }
+            .page-title {
+                font-size: 16px;
+            }
+            .top-action-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .notification-badge {
+                top: -6px;
+                right: -6px;
+                font-size: 9px;
+                min-width: 16px;
+                height: 16px;
+            }
+            .notification-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .notification-tabs {
+                padding-bottom: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面容器 -->
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            
+            <div class="page-title">消息提醒</div>
+            
+            <!-- 顶部右侧按钮容器 -->
+            <div class="top-actions">
+                <a href="./camera.html" class="top-action-btn">
+                    <i class="fas fa-camera"></i>
+                </a>
+                <a href="./notification.html" class="top-action-btn active">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">2</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 消息列表区域 -->
+        <div class="notification-list">
+            <div class="notification-header">
+                <h2 class="notification-title">我的消息</h2>
+                <div class="mark-read" id="markAllRead">全部标记为已读</div>
+            </div>
+            
+            <!-- 消息分类标签 -->
+            <div class="notification-tabs">
+                <div class="notification-tab active">全部消息</div>
+                <div class="notification-tab">系统通知</div>
+                <div class="notification-tab">互动消息</div>
+                <div class="notification-tab">活动提醒</div>
+                <div class="notification-tab">成就提醒</div>
+            </div>
+            
+            <!-- 消息列表 -->
+            <div class="notification-items">
+                <div class="notification-item unread">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>系统通知</div>
+                            <div class="notification-unread-indicator"></div>
+                        </div>
+                        <div class="notification-desc">参与"美食达人挑战赛"，赢取丰厚奖金！</div>
+                        <div class="notification-time">今天 10:30</div>
+                        <div class="notification-actions">
+                            <button class="action-btn primary">查看详情</button>
+                            <button class="action-btn">稍后提醒</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notification-item unread">
+                    <div class="notification-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>互动消息</div>
+                            <div class="notification-unread-indicator"></div>
+                        </div>
+                        <div class="notification-desc">用户"美食探险家"关注了你，去看看吧！</div>
+                        <div class="notification-time">昨天 18:45</div>
+                        <div class="notification-actions">
+                            <button class="action-btn primary">回关</button>
+                            <button class="action-btn">查看主页</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>互动消息</div>
+                        </div>
+                        <div class="notification-desc">用户"厨房小能手"评论了你的"红烧排骨"菜谱</div>
+                        <div class="notification-time">昨天 15:20</div>
+                        <div class="notification-actions">
+                            <button class="action-btn primary">查看评论</button>
+                            <button class="action-btn">回复</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-thumbs-up"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>互动消息</div>
+                        </div>
+                        <div class="notification-desc">用户"爱吃甜食"点赞了你的"提拉米苏"菜谱</div>
+                        <div class="notification-time">昨天 12:05</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>成就提醒</div>
+                        </div>
+                        <div class="notification-desc">恭喜你！完成"一周健康饮食"挑战</div>
+                        <div class="notification-time">前天 09:30</div>
+                        <div class="notification-actions">
+                            <button class="action-btn primary">领取奖励</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-item">
+                            <div>活动提醒</div>
+                        </div>
+                        <div class="notification-desc">你关注的食材"有机三文鱼"正在特价促销中！</div>
+                        <div class="notification-time">前天 15:45</div>
+                        <div class="notification-actions">
+                            <button class="action-btn primary">立即查看</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="../index.html" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="../discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="../share.html" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="../square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="../profile.html" class="nav-item active">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const markAllRead = document.getElementById('markAllRead');
+            const notificationItems = document.querySelectorAll('.notification-item');
+            const notificationTabs = document.querySelectorAll('.notification-tab');
+            
+            // 标记全部为已读
+            markAllRead.addEventListener('click', function() {
+                notificationItems.forEach(item => {
+                    item.classList.remove('unread');
+                    const indicator = item.querySelector('.notification-unread-indicator');
+                    if (indicator) indicator.style.display = 'none';
+                });
+                
+                // 更新未读计数
+                document.querySelector('.notification-badge').textContent = '0';
+                document.querySelector('.notification-badge').style.display = 'none';
+                
+                // 显示操作成功提示
+                alert('所有消息已标记为已读！');
+            });
+            
+            // 消息分类标签切换
+            notificationTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有标签的active状态
+                    notificationTabs.forEach(t => t.classList.remove('active'));
+                    // 添加当前标签的active状态
+                    this.classList.add('active');
+                    
+                    // 实际应用中这里会有过滤消息的逻辑
+                    alert('切换到分类: ' + this.textContent);
+                });
+            });
+            
+            // 消息项点击事件
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('action-btn')) {
+                        // 标记为已读
+                        if (this.classList.contains('unread')) {
+                            this.classList.remove('unread');
+                            const indicator = this.querySelector('.notification-unread-indicator');
+                            if (indicator) indicator.style.display = 'none';
+                            
+                            // 更新未读计数
+                            const badge = document.querySelector('.notification-badge');
+                            const count = parseInt(badge.textContent);
+                            if (count > 0) {
+                                badge.textContent = count - 1;
+                                if (count - 1 === 0) {
+                                    badge.style.display = 'none';
+                                }
+                            }
+                        }
+                        
+                        // 实际应用中这里会有跳转到消息详情的逻辑
+                        alert('打开消息详情');
+                    }
+                });
+            });
+            
+            // 操作按钮点击事件
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // 阻止事件冒泡到父元素
+                    
+                    const action = this.textContent;
+                    const message = this.closest('.notification-item').querySelector('.notification-desc').textContent;
+                    
+                    alert(`执行操作: ${action} (${message})`);
+                    
+                    // 特定操作处理
+                    if (action === '删除') {
+                        this.closest('.notification-item').remove();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

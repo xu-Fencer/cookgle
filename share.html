@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享菜谱 - 谷鸽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF7043;
+            --primary-light: #FF9E7D;
+            --light-bg: #F8F8F8;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+            --tag-bg: #f0f8ff;
+            --tag-color: #1e90ff;
+            --success: #4CAF50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .container {
+            padding-bottom: 70px;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 20px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        /* 编辑区域 */
+        .share-container {
+            background-color: var(--card-bg);
+            margin: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .editor-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .editor-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .editor-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* 内容编辑区 */
+        .editor-content {
+            padding: 20px;
+        }
+        
+        .editor-textarea {
+            width: 100%;
+            min-height: 150px;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            font-family: inherit;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .editor-textarea:focus {
+            outline: none;
+        }
+        
+        .editor-tools {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .tool-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tool-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        /* 图片上传区域 */
+        .image-upload {
+            margin-bottom: 20px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(255, 112, 67, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 42px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtext {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .image-preview {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .delete-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* 标签区域 */
+        .tags-container {
+            margin-bottom: 20px;
+        }
+        
+        .tags-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .tags-input {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .tags-input input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .tags-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .add-tag-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tag-item {
+            background-color: var(--tag-bg);
+            color: var(--tag-color);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remove-tag {
+            cursor: pointer;
+        }
+        
+        /* 发布按钮 */
+        .publish-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .publish-btn:hover {
+            background-color: #e05a38;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 112, 67, 0.4);
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            width: 60px;
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .top-bar {
+                padding: 10px 15px;
+            }
+            .logo-text {
+                font-size: 18px;
+            }
+            .page-title {
+                font-size: 16px;
+            }
+            .editor-header {
+                padding: 12px 15px;
+            }
+            .editor-content {
+                padding: 15px;
+            }
+            .editor-title {
+                font-size: 18px;
+            }
+            .upload-area {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 分享页面容器 -->
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="./index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            <div class="page-title">分享菜谱</div>
+        </div>
+        
+        <!-- 分享编辑区域 -->
+        <div class="share-container">
+            <div class="editor-header">
+                <div class="editor-title">分享你的美食时刻</div>
+                <div class="editor-subtitle">让更多人看到你的厨艺</div>
+            </div>
+            
+            <div class="editor-content">
+                <!-- 文字编辑区域 -->
+                <textarea class="editor-textarea" placeholder="分享你的烹饪心得或菜谱..."></textarea>
+                
+                <!-- 编辑工具栏 -->
+                <div class="editor-tools">
+                    <div class="tool-btn" title="添加图片" id="imageTool">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="tool-btn" title="添加标签" id="tagTool">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="tool-btn" title="添加表情">
+                        <i class="far fa-smile"></i>
+                    </div>
+                    <div class="tool-btn" title="添加位置">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                </div>
+                
+                <!-- 图片上传区域 -->
+                <div class="image-upload">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">点击或拖放图片到此处</div>
+                        <div class="upload-subtext">支持 JPG/PNG 格式，最多9张</div>
+                        <input type="file" id="fileInput" accept="image/*" multiple>
+                    </div>
+                    
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <!-- 图片预览区域 -->
+                    </div>
+                </div>
+                
+                <!-- 标签区域 -->
+                <div class="tags-container">
+                    <div class="tags-title">添加标签</div>
+                    <div class="tags-input">
+                        <input type="text" id="tagInput" placeholder="输入标签（以#开头）">
+                        <div class="add-tag-btn" id="addTagBtn">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                    <div class="tags-list" id="tagsList">
+                        <!-- 标签将在这里显示 -->
+                        <div class="tag-item">
+                            #家常菜
+                            <span class="remove-tag"><i class="fas fa-times"></i></span>
+                        </div>
+                        <div class="tag-item">
+                            #健康饮食
+                            <span class="remove-tag"><i class="fas fa-times"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 发布按钮 -->
+                <button class="publish-btn" id="publishBtn">
+                    <i class="fas fa-paper-plane"></i> 发布分享
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="./index.html" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="./discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="./share.html" class="nav-item active">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="./square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="./profile.html" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 元素获取
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imageTool = document.getElementById('imageTool');
+            const tagInput = document.getElementById('tagInput');
+            const addTagBtn = document.getElementById('addTagBtn');
+            const tagsList = document.getElementById('tagsList');
+            const publishBtn = document.getElementById('publishBtn');
+            const tagTool = document.getElementById('tagTool');
+            
+            // 图片上传功能
+            imageTool.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+            
+            // 拖放功能
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.style.borderColor = var('--primary');
+                uploadArea.style.backgroundColor = 'rgba(255, 112, 67, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.style.borderColor = '#e0e0e0';
+                uploadArea.style.backgroundColor = '';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#e0e0e0';
+                uploadArea.style.backgroundColor = '';
+                
+                if (e.dataTransfer.files.length) {
+                    handleFiles(e.dataTransfer.files);
+                }
+            });
+            
+            // 处理上传的图片
+            function handleFiles(files) {
+                if (imagePreviewContainer.children.length + files.length > 9) {
+                    alert('最多只能上传9张图片');
+                    return;
+                }
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    if (!file.type.match('image.*')) {
+                        alert('请上传图片文件');
+                        continue;
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const preview = document.createElement('div');
+                        preview.className = 'image-preview';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        
+                        const deleteBtn = document.createElement('div');
+                        deleteBtn.className = 'delete-image';
+                        deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        
+                        deleteBtn.addEventListener('click', function() {
+                            preview.remove();
+                        });
+                        
+                        preview.appendChild(img);
+                        preview.appendChild(deleteBtn);
+                        imagePreviewContainer.appendChild(preview);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // 标签功能
+            tagTool.addEventListener('click', function() {
+                tagInput.focus();
+            });
+            
+            addTagBtn.addEventListener('click', addTag);
+            
+            tagInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTag();
+                }
+            });
+            
+            function addTag() {
+                let tagText = tagInput.value.trim();
+                
+                if (!tagText) return;
+                
+                // 确保以#开头
+                if (!tagText.startsWith('#')) {
+                    tagText = '#' + tagText;
+                }
+                
+                // 创建标签元素
+                const tag = document.createElement('div');
+                tag.className = 'tag-item';
+                tag.innerHTML = `
+                    ${tagText}
+                    <span class="remove-tag"><i class="fas fa-times"></i></span>
+                `;
+                
+                // 添加删除功能
+                const removeBtn = tag.querySelector('.remove-tag');
+                removeBtn.addEventListener('click', function() {
+                    tag.remove();
+                });
+                
+                tagsList.appendChild(tag);
+                tagInput.value = '';
+            }
+            
+            // 发布功能
+            publishBtn.addEventListener('click', function() {
+                const textContent = document.querySelector('.editor-textarea').value;
+                const images = imagePreviewContainer.querySelectorAll('img');
+                const tags = Array.from(tagsList.querySelectorAll('.tag-item')).map(tag => 
+                    tag.textContent.replace('×', '').trim()
+                );
+                
+                if (!textContent && images.length === 0) {
+                    alert('请添加文字内容或图片');
+                    return;
+                }
+                
+                // 构建预览数据
+                const previewData = {
+                    text: textContent,
+                    imageCount: images.length,
+                    tags: tags
+                };
+                
+                // 显示成功消息
+                alert('分享成功发布！');
+                
+                // 重置表单
+                document.querySelector('.editor-textarea').value = '';
+                imagePreviewContainer.innerHTML = '';
+                tagsList.innerHTML = '';
+            });
+        });
+    </script>
+</body>
+</html>

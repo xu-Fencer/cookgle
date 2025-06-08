@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食材识别 - 谷鸽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF7043;
+            --primary-light: #FF9E7D;
+            --light-bg: #F8F8F8;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+            --notification: #FF5252;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .container {
+            padding-bottom: 70px;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 20px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 15px;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 顶部右侧按钮容器 */
+        .top-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-left: auto;
+        }
+        
+        /* 顶部按钮样式 */
+        .top-action-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .top-action-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .top-action-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 消息提醒徽章 */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 9px;
+            background-color: var(--notification);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        /* 页面内容 */
+        .camera-screen {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .camera-preview {
+            width: 100%;
+            height: 300px;
+            background-color: #333;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .scan-box {
+            width: 80%;
+            height: 200px;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .scan-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--primary);
+            animation: scan 2.5s infinite;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+        
+        .camera-btn {
+            margin-top: 20px;
+            padding: 14px 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 112, 67, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detected-items {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .detected-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .item-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .item-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        .item-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .recognition-info {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .info-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-content {
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .top-bar {
+                padding: 10px 15px;
+            }
+            .logo-text {
+                font-size: 18px;
+            }
+            .page-title {
+                font-size: 16px;
+            }
+            .top-action-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .notification-badge {
+                top: -6px;
+                right: -6px;
+                font-size: 9px;
+                min-width: 16px;
+                height: 16px;
+            }
+            .camera-preview {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面容器 -->
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            
+            <div class="page-title">食材识别</div>
+            
+            <!-- 顶部右侧按钮容器 -->
+            <div class="top-actions">
+                <a href="./camera.html" class="top-action-btn active">
+                    <i class="fas fa-camera"></i>
+                </a>
+                <a href="./notification.html" class="top-action-btn">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">3</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 相机识别区域 -->
+        <div class="camera-screen">
+            <h2>智能食材识别</h2>
+            <p>将食材放入取景框内，系统自动识别</p>
+            
+            <div class="camera-preview">
+                <div class="camera-overlay">
+                    <div class="scan-box">
+                        <div class="scan-animation"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="camera-btn">
+                <i class="fas fa-camera"></i> 拍摄照片
+            </button>
+            
+            <div class="recognition-info">
+                <div class="info-title">
+                    <i class="fas fa-lightbulb" style="color: #FFC107;"></i>
+                    <h3>识别提示</h3>
+                </div>
+                <div class="info-content">
+                    <p>• 确保食材在取景框内清晰可见</p>
+                    <p>• 一次识别1-3种食材效果最佳</p>
+                    <p>• 识别后系统将推荐相关食谱</p>
+                </div>
+            </div>
+            
+            <div class="detected-items">
+                <h3 class="detected-title">最近识别的食材</h3>
+                <div class="items-grid">
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-carrot"></i></div>
+                        <div class="item-name">胡萝卜</div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-apple-alt"></i></div>
+                        <div class="item-name">苹果</div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-drumstick-bite"></i></div>
+                        <div class="item-name">鸡腿</div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-fish"></i></div>
+                        <div class="item-name">三文鱼</div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-cheese"></i></div>
+                        <div class="item-name">芝士</div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-icon"><i class="fas fa-egg"></i></div>
+                        <div class="item-name">鸡蛋</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="../index.html" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="../discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="../share.html" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="../square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="../profile.html" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 相机按钮点击事件
+            const cameraBtn = document.querySelector('.camera-btn');
+            
+            cameraBtn.addEventListener('click', function() {
+                // 显示识别中状态
+                cameraBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
+                cameraBtn.disabled = true;
+                
+                // 模拟识别过程
+                setTimeout(() => {
+                    // 随机选择一种食材
+                    const items = ['胡萝卜', '苹果', '鸡腿', '三文鱼', '芝士', '鸡蛋'];
+                    const randomItem = items[Math.floor(Math.random() * items.length)];
+                    
+                    alert(`成功识别食材: ${randomItem}! 即将跳转到相关食谱...`);
+                    
+                    // 重置按钮状态
+                    cameraBtn.innerHTML = '<i class="fas fa-camera"></i> 拍摄照片';
+                    cameraBtn.disabled = false;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

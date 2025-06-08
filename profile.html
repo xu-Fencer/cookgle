@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谷鸽 - 我的</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF7043;
+            --primary-light: #FF9E7D;
+            --dark-bg: #1A1A1A;
+            --light-bg: #F8F8F8;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .container {
+            padding-bottom: 70px;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 20px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        /* 个人信息区域 */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), #FF8A65);
+            padding: 30px 20px;
+            color: white;
+            position: relative;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .settings-btn:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--primary);
+            font-weight: bold;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .profile-details {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-uid {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 0 10px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* 标签切换 */
+        .tabs {
+            display: flex;
+            background-color: var(--card-bg);
+            margin: 20px;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* 标签内容 */
+        .tab-content {
+            padding: 0 20px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        /* 个人动态 */
+        .activity-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .activity-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-light);
+            margin-right: 12px;
+        }
+        
+        .activity-info {
+            flex: 1;
+        }
+        
+        .activity-user {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .activity-content {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .activity-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 12px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+        
+        .activity-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* 收藏 */
+        .collection-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+        }
+        
+        .collection-image {
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+        }
+        
+        .collection-info {
+            flex: 1;
+            padding: 15px;
+        }
+        
+        .collection-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .collection-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
+        .collection-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        /* 口味偏好 */
+        .taste-preferences {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .taste-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .taste-icon {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .taste-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .taste-level {
+            height: 6px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .taste-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-light);
+            width: 60px;
+            text-decoration: none;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate {
+            animation: fadeIn 0.3s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- 我的页面容器 -->
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="./index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            <div class="page-title">我的</div>
+        </div>
+        
+        <!-- 个人信息区域 -->
+        <div class="profile-header">
+            <div class="settings-btn">
+                <i class="fas fa-cog"></i>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-avatar">食</div>
+                <div class="profile-details">
+                    <div class="profile-name">食神食客</div>
+                    <div class="profile-uid">UID: U12345678</div>
+                </div>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">138</div>
+                    <div class="stat-label">关注</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1,280</div>
+                    <div class="stat-label">粉丝</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">86</div>
+                    <div class="stat-label">菜谱</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 标签切换 -->
+        <div class="tabs">
+            <div class="tab active" data-tab="activities">个人动态</div>
+            <div class="tab" data-tab="collections">收藏</div>
+            <div class="tab" data-tab="tastes">口味偏好</div>
+        </div>
+        
+        <!-- 标签内容 -->
+        <div class="tab-content">
+            <!-- 个人动态 -->
+            <div class="tab-pane active" id="activities">
+                <div class="activity-item animate">
+                    <div class="activity-header">
+                        <div class="activity-avatar">食</div>
+                        <div class="activity-info">
+                            <div class="activity-user">食神食客</div>
+                            <div class="activity-time">1小时前</div>
+                        </div>
+                    </div>
+                    <div class="activity-content">
+                        刚刚发布了新菜谱「香辣蟹」，欢迎各位大厨们来交流心得！
+                    </div>
+                    <div class="activity-image">
+                        <i class="fas fa-utensils"></i> 香辣蟹图片
+                    </div>
+                    <div class="activity-stats">
+                        <span><i class="far fa-heart"></i> 128</span>
+                        <span><i class="far fa-comment"></i> 32</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item animate">
+                    <div class="activity-header">
+                        <div class="activity-avatar">食</div>
+                        <div class="activity-info">
+                            <div class="activity-user">食神食客</div>
+                            <div class="activity-time">昨天</div>
+                        </div>
+                    </div>
+                    <div class="activity-content">
+                        尝试了谷鸽AI助手推荐的减脂餐，效果很棒，一周瘦了1.5kg！
+                    </div>
+                    <div class="activity-image">
+                        <i class="fas fa-apple-alt"></i> 减脂餐图片
+                    </div>
+                    <div class="activity-stats">
+                        <span><i class="far fa-heart"></i> 89</span>
+                        <span><i class="far fa-comment"></i> 24</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item animate">
+                    <div class="activity-header">
+                        <div class="activity-avatar">食</div>
+                        <div class="activity-info">
+                            <div class="activity-user">食神食客</div>
+                            <div class="activity-time">3天前</div>
+                        </div>
+                    </div>
+                    <div class="activity-content">
+                        参加了谷鸽社区举办的厨艺大赛，获得了「创意大厨」称号！
+                    </div>
+                    <div class="activity-image">
+                        <i class="fas fa-medal"></i> 获奖证书
+                    </div>
+                    <div class="activity-stats">
+                        <span><i class="far fa-heart"></i> 156</span>
+                        <span><i class="far fa-comment"></i> 48</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 收藏 -->
+            <div class="tab-pane" id="collections">
+                <div class="collection-item animate">
+                    <div class="collection-image">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="collection-info">
+                        <div class="collection-title">川味经典</div>
+                        <div class="collection-desc">10道正宗川菜做法，麻辣鲜香</div>
+                        <div class="collection-meta">
+                            <span>收藏于：2023-10-15</span>
+                            <span>12道菜谱</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="collection-item animate">
+                    <div class="collection-image">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="collection-info">
+                        <div class="collection-title">健康轻食</div>
+                        <div class="collection-desc">低卡减脂，美味健康两不误</div>
+                        <div class="collection-meta">
+                            <span>收藏于：2023-09-22</span>
+                            <span>8道菜谱</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="collection-item animate">
+                    <div class="collection-image">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <div class="collection-info">
+                        <div class="collection-title">烘焙入门</div>
+                        <div class="collection-desc">新手必学的20款烘焙甜品</div>
+                        <div class="collection-meta">
+                            <span>收藏于：2023-08-05</span>
+                            <span>20道菜谱</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 口味偏好 -->
+            <div class="tab-pane" id="tastes">
+                <div class="feature-card animate">
+                    <div class="section-title">
+                        <h2>口味偏好设置</h2>
+                        <span class="action-link">编辑</span>
+                    </div>
+                    <div class="taste-preferences">
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-pepper-hot"></i></div>
+                            <div class="taste-name">辛辣</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-lemon"></i></div>
+                            <div class="taste-name">酸甜</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-fish"></i></div>
+                            <div class="taste-name">海鲜</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-leaf"></i></div>
+                            <div class="taste-name">清淡</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-cheese"></i></div>
+                            <div class="taste-name">奶香</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="taste-item">
+                            <div class="taste-icon"><i class="fas fa-drumstick-bite"></i></div>
+                            <div class="taste-name">肉食</div>
+                            <div class="taste-level">
+                                <div class="taste-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="./index.html" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="./discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="./share.html" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="./square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="./profile.html" class="nav-item active">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 标签切换功能
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有标签和内容的active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    
+                    // 添加当前标签的active类
+                    this.classList.add('active');
+                    
+                    // 显示对应的内容
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 设置按钮点击
+            const settingsBtn = document.querySelector('.settings-btn');
+            settingsBtn.addEventListener('click', function() {
+                alert('打开个人设置页面');
+            });
+            
+            // 点击活动项
+            const activityItems = document.querySelectorAll('.activity-item');
+            activityItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    alert('打开动态详情');
+                });
+            });
+            
+            // 点击收藏项
+            const collectionItems = document.querySelectorAll('.collection-item');
+            collectionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.collection-title').textContent;
+                    alert('打开收藏夹: ' + title);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
