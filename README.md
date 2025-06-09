@@ -1,11 +1,14 @@
 # 谷鸽 - Cookgle
 > 此项目仅为作业建业，无意抄袭 Google 的名字。
 
-[TOC]
+![Static Badge](https://img.shields.io/badge/%E8%B0%B7-%E9%B8%BD-orange)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/w/xu-fencer/cookgle)
+
+<!-- [TOC] -->
 
 ## 前言
 
-前端使用AI编写的代码，参考某同学设计的 UI。后端（目前计划）使用 PHP 与 mysql 数据库。通过 API或 Web SDK 连接 [Coze](https://www.coze.com/)，~~通过 Coze 设计工作流，此项目仅包含前后端，（目前计划）不对 Coze 工作流进行记录。~~
+前端使用AI编写的代码，参考某同学设计的 UI。后端（目前计划）使用 PHP 与 mysql 数据库。通过 API或 Web wSDK 连接 [Coze](https://www.coze.com/)，~~通过 Coze 设计工作流，此项目仅包含前后端，（目前计划）不对 Coze 工作流进行记录。~~
 
 在[Coze Learn文件](CozeLearn.md)中包含使用 Coze的相关信息
 
@@ -15,7 +18,7 @@
 - [ ] 修改页面主体`container` css 属性以防止 web sdk将其挤开
 - [ ] （或）自制 coze 聊天页面
 - [ ] 使用 Flask 制作后端接口连接数据库
-- [ ] 使用 Flask 制作后端接口连接 Coze 数据流
+- [ ] 使用 Flask 制作后端接口连接 Coze 工作流
 
 
 ## 文件结构
