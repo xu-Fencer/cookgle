@@ -1,21 +1,21 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const recommendations = document.getElementById('recommendations');
-    const loader = document.getElementById('loader');
-    const aiAssistantBtn = document.getElementById('aiAssistantBtn');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const loadedCount = document.getElementById('loadedCount');
-    const statusIndicator = document.getElementById('statusIndicator');
-    
-    let page = 1;
-    let lastLoadTime = 0;
-    let canLoadMore = true;
-    let totalLoaded = 0;
-    let cooldownTimer = null;
-    
-    // 生成智能推荐卡片
-    function generateRecommendationCard(data) {
+/* index.js - jQuery 实现 */
+$(function () {
+    const $recommendations  = $('#recommendations');
+    const $loader           = $('#loader');
+    const $aiAssistantBtn   = $('#aiAssistantBtn');
+    const $refreshBtn       = $('#refreshBtn');
+    const $loadedCount      = $('#loadedCount');
+    const $statusIndicator  = $('#statusIndicator');
+
+    let lastLoadTime = 0;       // 上次加载时间戳
+    let canLoadMore  = true;    // 节流开关
+    let totalLoaded  = 0;       // 已加载总数
+    let cooldownTmr  = null;    // 冷却计时器
+
+    /* ---------- 生成推荐卡片 HTML ---------- */
+    function generateCard(data) {
         return `
-            <div class="recipe-card" style="animation-delay: ${Math.random() * 0.3}s">
+            <div class="recipe-card" style="animation-delay:${Math.random() * 0.3}s">
                 <div class="recipe-image">
                     <i class="fas fa-${data.icon}"></i>
                     <div class="recipe-badge">${data.category}</div>
@@ -31,120 +31,90 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
     }
-    
-    // 获取推荐数据
+
+    /* ---------- 伪接口：随机生成推荐数据 ---------- */
     function getRecommendations() {
-        const categories = ["低卡轻食", "热门推荐", "家常菜", "新手友好", "快手菜", "下饭菜"];
-        const difficulties = ["简单", "中等", "困难"];
-        const icons = ["utensils", "pizza-slice", "hamburger", "fish", "egg", "carrot", "drumstick-bite", "ice-cream"];
-        
-        const results = [];
-        
-        // 每次加载4个推荐
-        for (let i = 0; i < 4; i++) {
-            results.push({
-                title: `智能推荐菜谱 #${totalLoaded + i + 1}`,
-                category: categories[Math.floor(Math.random() * categories.length)],
-                calories: Math.floor(Math.random() * 400) + 200,
-                time: Math.floor(Math.random() * 40) + 10,
-                difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
-                icon: icons[Math.floor(Math.random() * icons.length)]
-            });
-        }
-        
-        return results;
+        const categories   = ['低卡轻食', '热门推荐', '家常菜', '新手友好', '快手菜', '下饭菜'];
+        const difficulties = ['简单', '中等', '困难'];
+        const icons        = ['utensils', 'pizza-slice', 'hamburger', 'fish', 'egg', 'carrot', 'drumstick-bite', 'ice-cream'];
+
+        return Array.from({ length: 4 }, (_, i) => ({
+            title     : `智能推荐菜谱 #${totalLoaded + i + 1}`,
+            category  : categories[Math.floor(Math.random() * categories.length)],
+            calories  : Math.floor(Math.random() * 400) + 200,
+            time      : Math.floor(Math.random() * 40) + 10,
+            difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
+            icon      : icons[Math.floor(Math.random() * icons.length)]
+        }));
     }
-    
-    // 加载更多推荐
-    function loadMoreRecommendations() {
-        // 检查是否可以加载（1秒冷却）
-        const currentTime = Date.now();
-        if (currentTime - lastLoadTime < 1000) {
-            return;
-        }
-        
-        // 更新最后加载时间
-        lastLoadTime = currentTime;
-        
-        loader.style.display = 'block';
-        statusIndicator.style.display = 'none';
-        
-        // 模拟网络请求延迟
+
+    /* ---------- 加载更多推荐（带 1 s 节流） ---------- */
+    function loadMore() {
+        const now = Date.now();
+        if (now - lastLoadTime < 1000) return;   // 冷却期内不给加载
+        lastLoadTime = now;
+
+        $loader.show();
+        $statusIndicator.hide();
+
         setTimeout(() => {
-            const newRecommendations = getRecommendations();
-            
-            newRecommendations.forEach(data => {
-                const cardHTML = generateRecommendationCard(data);
-                recommendations.innerHTML += cardHTML;
+            getRecommendations().forEach(data => {
+                $recommendations.append(generateCard(data));
                 totalLoaded++;
             });
-            
-            // 更新加载计数
-            loadedCount.textContent = totalLoaded;
-            
-            loader.style.display = 'none';
-            statusIndicator.style.display = 'block';
-            
-            // 重置动画
-            const cards = document.querySelectorAll('.recipe-card');
-            cards.forEach(card => {
-                card.style.animation = 'none';
-                setTimeout(() => {
-                    card.style.animation = 'fadeIn 0.5s ease forwards';
-                }, 10);
+
+            $loadedCount.text(totalLoaded);
+
+            $loader.hide();
+            $statusIndicator.show();
+
+            /* 重触发每张卡片的 fadeIn 动画 */
+            $('.recipe-card').each(function () {
+                $(this).css('animation', 'none');
+                /* 强制 reflow */
+                void this.offsetWidth;
+                $(this).css('animation', 'fadeIn 0.5s ease forwards');
             });
-            
-            // 启用节流冷却
-            enableCooldown();
+
+            startCooldown();
         }, 500);
     }
-    
-    // 启用节流冷却
-    function enableCooldown() {
+
+    /* ---------- 开始 1 s 冷却 ---------- */
+    function startCooldown() {
         canLoadMore = false;
-        if (cooldownTimer) clearTimeout(cooldownTimer);
-        cooldownTimer = setTimeout(() => {
-            canLoadMore = true;
-        }, 1000);
+        clearTimeout(cooldownTmr);
+        cooldownTmr = setTimeout(() => (canLoadMore = true), 1000);
     }
-    
-    // 刷新推荐
-    function refreshRecommendations() {
-        recommendations.innerHTML = '';
-        page = 1;
+
+    /* ---------- 刷新推荐（清空后重新加载） ---------- */
+    function refresh() {
+        $recommendations.empty();
         totalLoaded = 0;
-        loadMoreRecommendations();
+        loadMore();
     }
-    
-    // 滚动加载更多（带节流）
-    function handleScroll() {
+
+    /* ---------- 监听滚动触底 ---------- */
+    $(window).on('scroll', function () {
         if (!canLoadMore) return;
-        
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-        
-        // 当滚动到距离底部100px时加载
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
-            loadMoreRecommendations();
-        }
-    }
-    
-    // 初始加载推荐
-    refreshRecommendations();
-    
-    // 事件监听
-    window.addEventListener('scroll', handleScroll);
-    refreshBtn.addEventListener('click', refreshRecommendations);
-    
-    aiAssistantBtn.addEventListener('click', function() {
-        alert('打开谷鸽AI助手，获取个性化菜谱推荐！');
+        const scrollTop  = $(this).scrollTop();
+        const clientH    = $(this).height();
+        const docH       = $(document).height();
+
+        if (scrollTop + clientH >= docH - 100) loadMore();
     });
-    
-    // 分类点击事件
-    const tasteItems = document.querySelectorAll('.taste-item');
-    tasteItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const categoryName = this.querySelector('.taste-name').textContent;
-            alert(`打开"${categoryName}"分类页面`);
-        });
+
+    /* ---------- 初始化 ---------- */
+    refresh();
+    $refreshBtn.on('click', refresh);
+
+    $aiAssistantBtn.on('click', () =>
+        alert('打开谷鸽AI助手，获取个性化菜谱推荐！')
+    );
+
+    /* ---------- 分类点击 ---------- */
+    $('.taste-item').on('click', function () {
+        const name = $(this).find('.taste-name').text();
+        alert(`打开"${name}"分类页面`);
     });
 });

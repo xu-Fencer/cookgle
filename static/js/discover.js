@@ -1,62 +1,50 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 为历史记录删除按钮添加事件
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const historyItem = this.closest('.history-item');
-            historyItem.style.animation = 'fadeOut 0.3s forwards';
-            setTimeout(() => {
-                historyItem.remove();
-            }, 300);
+/* discover.js - jQuery 实现 */
+$(function () {
+    /* ---------- 历史记录删除 ---------- */
+    $('.delete-btn').on('click', function (e) {
+        e.stopPropagation();                        // 阻止冒泡
+        const $historyItem = $(this).closest('.history-item');
+        $historyItem.css('animation', 'fadeOut 0.3s forwards');
+        setTimeout(() => $historyItem.remove(), 300);
+    });
+
+    /* ---------- 一键清空历史 ---------- */
+    $('.clear-history').on('click', function () {
+        $('.history-item').each(function () {
+            const $item = $(this);
+            $item.css('animation', 'fadeOut 0.3s forwards');
+            setTimeout(() => $item.remove(), 300);
         });
     });
-    
-    // 清空历史记录按钮
-    const clearHistoryBtn = document.querySelector('.clear-history');
-    clearHistoryBtn.addEventListener('click', function() {
-        const historyItems = document.querySelectorAll('.history-item');
-        historyItems.forEach(item => {
-            item.style.animation = 'fadeOut 0.3s forwards';
-            setTimeout(() => {
-                item.remove();
-            }, 300);
-        });
+
+    /* ---------- 注入 fadeOut 关键帧 ---------- */
+    $('<style>', {
+        text:
+            '@keyframes fadeOut{' +
+            'from{opacity:1;transform:translateY(0);}' +
+            'to{opacity:0;transform:translateY(-10px);}' +
+            '}'
+    }).appendTo('head');
+
+    /* ---------- 点击历史记录项 ---------- */
+    $('.history-item').on('click', function () {
+        const text = $(this).find('.history-text span').text();
+        alert('搜索: ' + text);
     });
-    
-    // 为动画添加CSS keyframes
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // 点击历史记录项
-    const historyItems = document.querySelectorAll('.history-item');
-    historyItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const text = this.querySelector('.history-text span').textContent;
-            alert('搜索: ' + text);
-        });
+
+    /* ---------- 点击热门菜谱 ---------- */
+    $('.recipe-item').on('click', function () {
+        const title = $(this).find('.recipe-title').text();
+        alert('打开菜谱: ' + title);
     });
-    
-    // 点击热门菜谱
-    const recipeItems = document.querySelectorAll('.recipe-item');
-    recipeItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const title = this.querySelector('.recipe-title').textContent;
-            alert('打开菜谱: ' + title);
-        });
-    });
-    
-    // 动画效果 - 延迟显示
+
+    /* ---------- 初始淡入动画 ---------- */
     setTimeout(() => {
-        document.querySelectorAll('.recipe-item, .history-item').forEach((item, index) => {
-            item.style.animation = 'fadeIn 0.5s forwards';
-            item.style.animationDelay = `${index * 0.05}s`;
+        $('.recipe-item, .history-item').each(function (idx) {
+            $(this).css({
+                animation: 'fadeIn 0.5s forwards',
+                'animation-delay': `${idx * 0.05}s`
+            });
         });
     }, 100);
 });

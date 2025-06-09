@@ -1,158 +1,124 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 元素获取
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    const imageTool = document.getElementById('imageTool');
-    const tagInput = document.getElementById('tagInput');
-    const addTagBtn = document.getElementById('addTagBtn');
-    const tagsList = document.getElementById('tagsList');
-    const publishBtn = document.getElementById('publishBtn');
-    const tagTool = document.getElementById('tagTool');
-    
-    // 图片上传功能
-    imageTool.addEventListener('click', function() {
-        fileInput.click();
-    });
-    
-    uploadArea.addEventListener('click', function() {
-        fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', function(e) {
-        handleFiles(e.target.files);
-    });
-    
-    // 拖放功能
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.style.borderColor = getComputedStyle(root).getPropertyValue('--primary');
-        uploadArea.style.backgroundColor = 'rgba(255, 112, 67, 0.1)';
-    });
-    
-    uploadArea.addEventListener('dragleave', function() {
-        uploadArea.style.borderColor = '#e0e0e0';
-        uploadArea.style.backgroundColor = '';
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.style.borderColor = '#e0e0e0';
-        uploadArea.style.backgroundColor = '';
-        
-        if (e.dataTransfer.files.length) {
-            handleFiles(e.dataTransfer.files);
-        }
-    });
-    
-    // 处理上传的图片
+/* share.js - jQuery 实现 */
+$(function () {
+    /* ---------- 元素缓存 ---------- */
+    const $uploadArea            = $('#uploadArea');
+    const $fileInput             = $('#fileInput');
+    const $imagePreviewContainer = $('#imagePreviewContainer');
+    const $imageTool             = $('#imageTool');
+    const $tagInput              = $('#tagInput');
+    const $addTagBtn             = $('#addTagBtn');
+    const $tagsList              = $('#tagsList');
+    const $publishBtn            = $('#publishBtn');
+    const $tagTool               = $('#tagTool');
+    const root                   = document.documentElement; // 用于读取 CSS 变量
+
+    /* ---------- 打开文件选择框 ---------- */
+    $imageTool.on('click', () => $fileInput[0].click());
+    $uploadArea.on('click', () => $fileInput[0].click());
+
+    /* ---------- 文件选择 ---------- */
+    $fileInput.on('change', e => handleFiles(e.target.files));
+
+    /* ---------- 拖放上传 ---------- */
+    $uploadArea
+        .on('dragover', e => {
+            e.preventDefault();
+            $uploadArea.css({
+                borderColor    : getComputedStyle(root).getPropertyValue('--primary'),
+                backgroundColor: 'rgba(255, 112, 67, .1)'
+            });
+        })
+        .on('dragleave', () =>
+            $uploadArea.css({ borderColor: '#e0e0e0', backgroundColor: '' })
+        )
+        .on('drop', e => {
+            e.preventDefault();
+            $uploadArea.css({ borderColor: '#e0e0e0', backgroundColor: '' });
+            if (e.originalEvent.dataTransfer.files.length)
+                handleFiles(e.originalEvent.dataTransfer.files);
+        });
+
+    /* ---------- 处理文件 ---------- */
     function handleFiles(files) {
-        if (imagePreviewContainer.children.length + files.length > 9) {
+        if ($imagePreviewContainer.children().length + files.length > 9) {
             alert('最多只能上传9张图片');
             return;
         }
-        
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            
+
+        $.each(files, (_, file) => {
             if (!file.type.match('image.*')) {
                 alert('请上传图片文件');
-                continue;
+                return;
             }
-            
+
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const preview = document.createElement('div');
-                preview.className = 'image-preview';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                
-                const deleteBtn = document.createElement('div');
-                deleteBtn.className = 'delete-image';
-                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-                
-                deleteBtn.addEventListener('click', function() {
-                    preview.remove();
+            reader.onload = e => {
+                const $preview = $('<div>', { class: 'image-preview' });
+                const $img     = $('<img>', { src: e.target.result });
+                const $delBtn  = $('<div>', {
+                    class: 'delete-image',
+                    html : '<i class="fas fa-times"></i>'
                 });
-                
-                preview.appendChild(img);
-                preview.appendChild(deleteBtn);
-                imagePreviewContainer.appendChild(preview);
+
+                /* 删除单张预览 */
+                $delBtn.on('click', () => $preview.remove());
+
+                $preview.append($img, $delBtn).appendTo($imagePreviewContainer);
             };
-            
             reader.readAsDataURL(file);
-        }
-    }
-    
-    // 标签功能
-    tagTool.addEventListener('click', function() {
-        tagInput.focus();
-    });
-    
-    addTagBtn.addEventListener('click', addTag);
-    
-    tagInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addTag();
-        }
-    });
-    
-    function addTag() {
-        let tagText = tagInput.value.trim();
-        
-        if (!tagText) return;
-        
-        // 确保以#开头
-        if (!tagText.startsWith('#')) {
-            tagText = '#' + tagText;
-        }
-        
-        // 创建标签元素
-        const tag = document.createElement('div');
-        tag.className = 'tag-item';
-        tag.innerHTML = `
-            ${tagText}
-            <span class="remove-tag"><i class="fas fa-times"></i></span>
-        `;
-        
-        // 添加删除功能
-        const removeBtn = tag.querySelector('.remove-tag');
-        removeBtn.addEventListener('click', function() {
-            tag.remove();
         });
-        
-        tagsList.appendChild(tag);
-        tagInput.value = '';
     }
-    
-    // 发布功能
-    publishBtn.addEventListener('click', function() {
-        const textContent = document.querySelector('.editor-textarea').value;
-        const images = imagePreviewContainer.querySelectorAll('img');
-        const tags = Array.from(tagsList.querySelectorAll('.tag-item')).map(tag => 
-            tag.textContent.replace('×', '').trim()
-        );
-        
-        if (!textContent && images.length === 0) {
+
+    /* ---------- 标签输入 ---------- */
+    $tagTool.on('click', () => $tagInput.focus());
+    $addTagBtn.on('click', addTag);
+    $tagInput.on('keypress', e => e.key === 'Enter' && addTag());
+
+    function addTag() {
+        let text = $.trim($tagInput.val());
+        if (!text) return;
+
+        if (!text.startsWith('#')) text = '#' + text;
+
+        const $tag = $(`
+            <div class="tag-item">
+                ${text}
+                <span class="remove-tag"><i class="fas fa-times"></i></span>
+            </div>
+        `);
+
+        $tag.find('.remove-tag').on('click', () => $tag.remove());
+
+        $tagsList.append($tag);
+        $tagInput.val('');
+    }
+
+    /* ---------- 发布按钮 ---------- */
+    $publishBtn.on('click', () => {
+        const textContent = $('.editor-textarea').val();
+        const images      = $imagePreviewContainer.find('img');
+        const tags        = $tagsList.find('.tag-item').map((_, el) =>
+            $(el).text().replace('×', '').trim()
+        ).get();
+
+        if (!textContent && !images.length) {
             alert('请添加文字内容或图片');
             return;
         }
-        
-        // 构建预览数据
-        const previewData = {
-            text: textContent,
+
+        /* 预览数据，可根据需要提交到后端 */
+        const preview = {
+            text      : textContent,
             imageCount: images.length,
-            tags: tags
+            tags
         };
-        
-        // 显示成功消息
+        console.log('发布数据', preview);
+
         alert('分享成功发布！');
-        
-        // 重置表单
-        document.querySelector('.editor-textarea').value = '';
-        imagePreviewContainer.innerHTML = '';
-        tagsList.innerHTML = '';
+
+        /* 重置表单 */
+        $('.editor-textarea').val('');
+        $imagePreviewContainer.empty();
+        $tagsList.empty();
     });
 });

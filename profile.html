@@ -6,6 +6,7 @@
     <title>谷鸽 - 我的</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="static/css/profile.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <!-- 我的页面容器 -->
@@ -246,50 +247,6 @@
         </a>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 标签切换功能
-            const tabs = document.querySelectorAll('.tab');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // 移除所有标签和内容的active类
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
-                    
-                    // 添加当前标签的active类
-                    this.classList.add('active');
-                    
-                    // 显示对应的内容
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-            
-            // 设置按钮点击
-            const settingsBtn = document.querySelector('.settings-btn');
-            settingsBtn.addEventListener('click', function() {
-                alert('打开个人设置页面');
-            });
-            
-            // 点击活动项
-            const activityItems = document.querySelectorAll('.activity-item');
-            activityItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    alert('打开动态详情');
-                });
-            });
-            
-            // 点击收藏项
-            const collectionItems = document.querySelectorAll('.collection-item');
-            collectionItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const title = this.querySelector('.collection-title').textContent;
-                    alert('打开收藏夹: ' + title);
-                });
-            });
-        });
-    </script>
+    <script src="static/js/profile.js"></script>
 </body>
 </html>
