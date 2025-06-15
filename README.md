@@ -12,6 +12,8 @@
 
 在[Coze Learn文件](CozeLearn.md)中包含使用 Coze的相关信息
 
+API 文档在[apiDoc.md](apiDoc.md)中
+
 ## Todo list
 
 - [x] 使用 jQuery 代替原生 JS
