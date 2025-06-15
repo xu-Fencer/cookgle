@@ -34,7 +34,48 @@ cookgle_____ 网站主要静态页面（包含文件夹）
 
 （目前计划）使用 jQuery，~~PHP7.4~~，Flask，MySQL
 
+## 表结构
+```
++--------------------+-----------+--------------------------+-------------+----------------+
+| COLUMN_NAME        | DATA_TYPE | CHARACTER_MAXIMUM_LENGTH | IS_NULLABLE | COLUMN_DEFAULT |
++--------------------+-----------+--------------------------+-------------+----------------+
+| id                 | int       |                     NULL | NO          | NULL           |
+| recipe_id          | varchar   |                      255 | NO          | NULL           |
+| name               | varchar   |                      255 | NO          | NULL           |
+| description        | text      |                    65535 | NO          | NULL           |
+| source_path        | varchar   |                      255 | NO          | NULL           |
+| image_path         | varchar   |                      255 | YES         | NULL           |
+| category           | varchar   |                       50 | NO          | NULL           |
+| difficulty         | int       |                     NULL | NO          | NULL           |
+| tags               | varchar   |                      255 | NO          | NULL           |
+| servings           | int       |                     NULL | NO          | NULL           |
+| ingredients        | text      |                    65535 | NO          | NULL           |
+| steps              | text      |                    65535 | YES         | NULL           |
+| prep_time_minutes  | int       |                     NULL | YES         | NULL           |
+| cook_time_minutes  | int       |                     NULL | YES         | NULL           |
+| total_time_minutes | int       |                     NULL | YES         | NULL           |
+| additional_notes   | text      |                    65535 | NO          | NULL           |
++--------------------+-----------+--------------------------+-------------+----------------+
+```
 
+| COLUMN_NAME        | DATA_TYPE | CHARACTER_MAXIMUM_LENGTH | IS_NULLABLE | COLUMN_DEFAULT |
+|--------------------|-----------|--------------------------|-------------|----------------|
+| id                 | int       | NULL                     | NO          | NULL           |
+| recipe_id          | varchar   | 255                      | NO          | NULL           |
+| name               | varchar   | 255                      | NO          | NULL           |
+| description        | text      | 65535                    | NO          | NULL           |
+| source_path        | varchar   | 255                      | NO          | NULL           |
+| image_path         | varchar   | 255                      | YES         | NULL           |
+| category           | varchar   | 50                       | NO          | NULL           |
+| difficulty         | int       | NULL                     | NO          | NULL           |
+| tags               | varchar   | 255                      | NO          | NULL           |
+| servings           | int       | NULL                     | NO          | NULL           |
+| ingredients        | text      | 65535                    | NO          | NULL           |
+| steps              | text      | 65535                    | YES         | NULL           |
+| prep_time_minutes  | int       | NULL                     | YES         | NULL           |
+| cook_time_minutes  | int       | NULL                     | YES         | NULL           |
+| total_time_minutes | int       | NULL                     | YES         | NULL           |
+| additional_notes   | text      | 65535                    | NO          | NULL           |
 
 ## 许可证
 
