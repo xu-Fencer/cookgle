@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享菜谱 - 谷鸽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="static/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 分享页面容器 -->
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="./index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            <div class="page-title">分享菜谱</div>
+        </div>
+        
+        <!-- 分享编辑区域 -->
+        <div class="share-container">
+            <div class="editor-header">
+                <div class="editor-title">分享你的美食时刻</div>
+                <div class="editor-subtitle">让更多人看到你的厨艺</div>
+            </div>
+            
+            <div class="editor-content">
+                <!-- 文字编辑区域 -->
+                <textarea class="editor-textarea" placeholder="分享你的烹饪心得或菜谱..."></textarea>
+                
+                <!-- 编辑工具栏 -->
+                <div class="editor-tools">
+                    <div class="tool-btn" title="添加图片" id="imageTool">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="tool-btn" title="添加标签" id="tagTool">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="tool-btn" title="添加表情">
+                        <i class="far fa-smile"></i>
+                    </div>
+                    <div class="tool-btn" title="添加位置">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                </div>
+                
+                <!-- 图片上传区域 -->
+                <div class="image-upload">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">点击或拖放图片到此处</div>
+                        <div class="upload-subtext">支持 JPG/PNG 格式，最多9张</div>
+                        <input type="file" id="fileInput" accept="image/*" multiple>
+                    </div>
+                    
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <!-- 图片预览区域 -->
+                    </div>
+                </div>
+                
+                <!-- 标签区域 -->
+                <div class="tags-container">
+                    <div class="tags-title">添加标签</div>
+                    <div class="tags-input">
+                        <input type="text" id="tagInput" placeholder="输入标签（以#开头）">
+                        <div class="add-tag-btn" id="addTagBtn">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                    <div class="tags-list" id="tagsList">
+                        <!-- 标签将在这里显示 -->
+                        <div class="tag-item">
+                            #家常菜
+                            <span class="remove-tag"><i class="fas fa-times"></i></span>
+                        </div>
+                        <div class="tag-item">
+                            #健康饮食
+                            <span class="remove-tag"><i class="fas fa-times"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 发布按钮 -->
+                <button class="publish-btn" id="publishBtn">
+                    <i class="fas fa-paper-plane"></i> 发布分享
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="./index.html" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="./discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="./share.html" class="nav-item active">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="./square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="./profile.html" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    <script src="static/js/share.js"></script>
+
+</body>
+</html>

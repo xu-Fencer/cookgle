@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谷鸽 - 智能厨房助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="static/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 首页容器 -->
+    <div class="container">
+        <!-- 顶部栏 - 优化布局 -->
+        <div class="top-bar">
+            <a href="./index.html" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            
+            <div class="page-title">首页</div>
+            
+            <!-- 顶部右侧按钮容器 - 确保靠右 -->
+            <div class="top-actions">
+                <a href="./index/camera.html" class="top-action-btn">
+                    <i class="fas fa-camera"></i>
+                </a>
+                <a href="./index/notification.html" class="top-action-btn">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">2</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 搜索区域 -->
+        <div class="search-section">
+            <div class="search-box">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" placeholder="搜索菜谱、食材或厨师...">
+            </div>
+        </div>
+        
+        <!-- 热门菜谱分类 -->
+        <div class="feature-card">
+            <div class="section-title">
+                <h2>热门菜谱分类</h2>
+                <span class="action-link">查看全部</span>
+            </div>
+            <div class="taste-preferences">
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-bread-slice"></i></div>
+                    <div class="taste-name">早餐</div>
+                </div>
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-utensils"></i></div>
+                    <div class="taste-name">午餐</div>
+                </div>
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-moon"></i></div>
+                    <div class="taste-name">晚餐</div>
+                </div>
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-birthday-cake"></i></div>
+                    <div class="taste-name">烘焙</div>
+                </div>
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-leaf"></i></div>
+                    <div class="taste-name">素食</div>
+                </div>
+                <div class="taste-item">
+                    <div class="taste-icon"><i class="fas fa-apple-alt"></i></div>
+                    <div class="taste-name">轻食</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 智能推荐 -->
+        <div class="feature-card">
+            <div class="section-title">
+                <h2>智能推荐</h2>
+                <span class="action-link" id="refreshBtn">刷新</span>
+            </div>
+            <div class="recommendations" id="recommendations">
+                <!-- 推荐内容将通过JavaScript动态生成 -->
+            </div>
+            <div class="loader" id="loader">
+                <i class="fas fa-spinner"></i> 正在加载更多推荐...
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                已加载 <span id="loadedCount">0</span> 个推荐
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="./index.html" class="nav-item active">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="./discover.html" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="./share.html" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="./square.html" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="./profile.html" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    <script src="static/js/index.js"></script>
+    <!-- <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.10/libs/cn/index.js"></script>
+    <script>
+      new CozeWebSDK.WebChatClient({
+        config: {
+          bot_id: '7512513036494749750',
+        },
+        componentProps: {
+          title: 'Coze',
+        },
+        auth: {
+          type: 'token',
+          token: '',
+        onRefreshToken: function () {
+            return ''
+        }
+        }
+      });
+    </script> -->
+</body>
+</html>

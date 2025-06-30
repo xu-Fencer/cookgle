@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, abort
 from config import DevelopmentConfig
 from dotenv import load_dotenv
 import os
-
+import markdown
 import mysql.connector
 from mysql.connector import Error
 
@@ -82,6 +82,69 @@ def search_name():
     finally:
         if conn and conn.is_connected():
             conn.close()
+
+# 菜谱详情页面
+@app.route('/recipe/<int:recipe_id>')
+def recipe_detail(recipe_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute(
+                "SELECT * FROM recipes1 WHERE id = %s",
+                (recipe_id,)
+            )
+            recipe = cur.fetchone()
+        if not recipe:
+            abort(404, description="菜谱不存在")
+
+        # markdown 字段转 html
+        for field in ['description', 'ingredients', 'steps', 'additional_notes']:
+            value = recipe.get(field) or ''
+            recipe[f"{field}_html"] = markdown.markdown(value, extensions=['extra', 'nl2br'])
+
+        # 假设点赞/收藏状态和数量也查出来了（这里用假数据演示）
+        recipe['liked'] = False  # 实际应查用户状态
+        recipe['collected'] = False
+        recipe['like_count'] = 10  # 实际应查数据库
+        recipe['collect_count'] = 5
+
+        return render_template('recipe_detail.html', recipe=recipe)
+    except Error as e:
+        abort(500, description=f"数据库错误: {e}")
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/discover')
+def discover():
+    return render_template('discover.html')
+
+@app.route('/share')
+def share():
+    return render_template('share.html')
+
+@app.route('/square')
+def square():
+    return render_template('square.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/camera')
+def camera():
+    return render_template('camera.html')
+
+@app.route('/notification')
+def notification():
+    return render_template('notification.html')
+
+
 
 if __name__ == '__main__':
     # 如果你已经在配置中指定了SERVER_NAME，可以直接运行。
