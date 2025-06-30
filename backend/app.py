@@ -26,9 +26,9 @@ app = Flask(__name__)
 # 这里以开发环境为例
 app.config.from_object(DevelopmentConfig)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+# @app.route('/')
+# def hello_world():
+#     return 'Hello, World!'
 
 # === 数据库连接函数 ===
 def get_db_connection():

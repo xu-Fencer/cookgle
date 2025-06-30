@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>谷鸽 - 智能厨房助手</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="static/css/all.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
@@ -13,7 +13,7 @@
     <div class="container">
         <!-- 顶部栏 - 优化布局 -->
         <div class="top-bar">
-            <a href="./index.html" class="logo">
+            <a href="{{ url_for('index') }}" class="logo">
                 <div class="logo-icon">谷</div>
                 <div class="logo-text">谷鸽</div>
             </a>
@@ -22,10 +22,10 @@
             
             <!-- 顶部右侧按钮容器 - 确保靠右 -->
             <div class="top-actions">
-                <a href="./index/camera.html" class="top-action-btn">
+                <a href="{{ url_for('camera') }}" class="top-action-btn">
                     <i class="fas fa-camera"></i>
                 </a>
-                <a href="./index/notification.html" class="top-action-btn">
+                <a href="{{ url_for('notification') }}" class="top-action-btn">
                     <i class="fas fa-bell"></i>
                     <div class="notification-badge">2</div>
                 </a>
@@ -97,28 +97,28 @@
     
     <!-- 底部导航栏 -->
     <div class="bottom-nav">
-        <a href="./index.html" class="nav-item active">
+        <a href="{{ url_for('index') }}" class="nav-item">
             <i class="nav-icon fas fa-home"></i>
             <span>首页</span>
         </a>
-        <a href="./discover.html" class="nav-item">
+        <a href="{{ url_for('discover') }}" class="nav-item">
             <i class="nav-icon fas fa-search"></i>
             <span>发现</span>
         </a>
-        <a href="./share.html" class="nav-item">
+        <a href="{{ url_for('share') }}" class="nav-item">
             <i class="nav-icon fas fa-plus-circle"></i>
             <span>分享</span>
         </a>
-        <a href="./square.html" class="nav-item">
+        <a href="{{ url_for('square') }}" class="nav-item">
             <i class="nav-icon fas fa-heart"></i>
             <span>广场</span>
         </a>
-        <a href="./profile.html" class="nav-item">
+        <a href="{{ url_for('profile') }}" class="nav-item">
             <i class="nav-icon fas fa-user"></i>
             <span>我的</span>
         </a>
     </div>
-    <script src="static/js/index.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js')}}"></script>
     <!-- <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.10/libs/cn/index.js"></script>
     <script>
       new CozeWebSDK.WebChatClient({
