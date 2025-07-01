@@ -126,6 +126,7 @@ def search():
             SELECT id, name, description, image_path, category
             FROM recipes1
             WHERE name LIKE %s
+            ORDER BY id DESC
         """
         like_pattern = f"%{keyword}%"
         conn = None
@@ -142,9 +143,40 @@ def search():
                 conn.close()
     return render_template('search_results.html', keyword=keyword, results=results)
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
+
+# 允许的分类
+ALLOWED_CATEGORIES = [
+    "半成品", "调味料", "荤菜", "水产", "素菜", "汤羹", "甜品", "饮品", "早餐", "主食"
+]
+
+# 分类页面
+@app.route('/category/<category>')
+def category_page(category):
+    if category not in ALLOWED_CATEGORIES:
+        abort(404)
+    sql = """
+        SELECT id, name, description, image_path, category
+        FROM recipes1
+        WHERE category = %s
+        ORDER BY id DESC
+    """
+    results = []
+    conn = None
+    try:
+        conn = get_db_connection()
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute(sql, (category,))
+            results = cur.fetchall()
+    except Error as e:
+        return f"数据库错误: {e}", 500
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return render_template('category.html', category=category, results=results)
+
+# @app.errorhandler(404)
+# def page_not_found(e):
+#     return render_template('404.html'), 404
 
 @app.route('/')
 def index():

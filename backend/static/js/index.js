@@ -128,8 +128,10 @@ $(function () {
     );
 
     /* ---------- 分类点击 ---------- */
-    $('.taste-item').on('click', function () {
-        const name = $(this).find('.taste-name').text();
-        alert(`打开"${name}"分类页面`);
+    $('.taste-item').on('click', function() {
+        var category = $(this).data('category');
+        if (category) {
+            window.location.href = '/category/' + encodeURIComponent(category);
+        }
     });
 });

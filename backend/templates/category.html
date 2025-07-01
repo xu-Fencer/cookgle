@@ -1,10 +1,10 @@
-<!-- templates/search_results.html -->
+<!-- templates/category.html -->
 <!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ keyword }} - 搜索结果</title>
+    <title>{{ category }} - 分类</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -17,13 +17,13 @@
                 <div class="logo-icon">谷</div>
                 <div class="logo-text">谷鸽</div>
             </a>
-            <div class="page-title">搜索结果</div>
+            <div class="page-title">分类：{{ category }}</div>
         </div>
 
-        <!-- 搜索结果 -->
+        <!-- 分类结果 -->
         <div class="feature-card" style="margin-top:20px;">
             <div class="section-title">
-                <h2>与“{{ keyword }}”相关的菜谱</h2>
+                <h2>“{{ category }}”下的菜谱</h2>
                 <span class="action-link">{{ results|length }} 条结果</span>
             </div>
             <div class="recommendations">
@@ -53,13 +53,12 @@
                 {% else %}
                     <div style="text-align:center; color:var(--text-light); padding:40px 0;">
                         <i class="fas fa-search" style="font-size:48px;"></i>
-                        <div style="margin-top:10px;">没有找到相关菜谱</div>
+                        <div style="margin-top:10px;">该分类下暂无菜谱</div>
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
-    <!-- 可选：底部导航栏 -->
     <div class="bottom-nav">
         <a href="{{ url_for('index') }}" class="nav-item">
             <i class="nav-icon fas fa-home"></i>
