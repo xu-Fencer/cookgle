@@ -12,6 +12,21 @@ $(function () {
     let totalLoaded  = 0;       // 已加载总数
     let cooldownTmr  = null;    // 冷却计时器
 
+    function doSearch() {
+        var keyword = $('#search-input').val().trim();
+        if (keyword) {
+            window.location.href = '/search?name=' + encodeURIComponent(keyword);
+        }
+    }
+    $('#search-input').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            doSearch();
+        }
+    });
+    $('#search-btn').on('click', function() {
+        doSearch();
+    });
+
     /* ---------- 生成推荐卡片 HTML ---------- */
     function generateCard(data) {
         return `

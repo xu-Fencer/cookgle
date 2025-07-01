@@ -116,6 +116,36 @@ def recipe_detail(recipe_id):
         if conn and conn.is_connected():
             conn.close()
 
+# 搜索结果页
+@app.route('/search')
+def search():
+    keyword = request.args.get("name", "").strip()
+    results = []
+    if keyword:
+        sql = """
+            SELECT id, name, description, image_path, category
+            FROM recipes1
+            WHERE name LIKE %s
+        """
+        like_pattern = f"%{keyword}%"
+        conn = None
+        try:
+            conn = get_db_connection()
+            with conn.cursor(dictionary=True) as cur:
+                cur.execute(sql, (like_pattern,))
+                results = cur.fetchall()
+        except Error as e:
+            # 你可以渲染一个错误页面
+            return f"数据库错误: {e}", 500
+        finally:
+            if conn and conn.is_connected():
+                conn.close()
+    return render_template('search_results.html', keyword=keyword, results=results)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 @app.route('/')
 def index():
     return render_template('index.html')

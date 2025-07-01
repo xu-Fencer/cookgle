@@ -1,5 +1,21 @@
 /* discover.js - jQuery 实现 */
 $(function () {
+    
+    function doSearch() {
+        var keyword = $('#search-input').val().trim();
+        if (keyword) {
+            window.location.href = '/search?name=' + encodeURIComponent(keyword);
+        }
+    }
+    $('#search-input').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            doSearch();
+        }
+    });
+    $('#search-btn').on('click', function() {
+        doSearch();
+    });
+    
     /* ---------- 历史记录删除 ---------- */
     $('.delete-btn').on('click', function (e) {
         e.stopPropagation();                        // 阻止冒泡

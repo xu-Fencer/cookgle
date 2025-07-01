@@ -1,0 +1,94 @@
+<!-- templates/search_results.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ keyword }} - 搜索结果</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <a href="{{ url_for('index') }}" class="logo">
+                <div class="logo-icon">谷</div>
+                <div class="logo-text">谷鸽</div>
+            </a>
+            <div class="page-title">搜索结果</div>
+        </div>
+
+        <!-- 搜索结果 -->
+        <div class="feature-card" style="margin-top:20px;">
+            <div class="section-title">
+                <h2>与“{{ keyword }}”相关的菜谱</h2>
+                <span class="action-link">{{ results|length }} 条结果</span>
+            </div>
+            <div class="recommendations">
+                {% if results %}
+                    {% for recipe in results %}
+                    <div class="recipe-card" style="width:100%; max-width:420px; min-width:220px; cursor:pointer;" data-url="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">
+                        <div class="recipe-image" style="height:140px; display:flex; align-items:center; justify-content:center; background:#f0f0f0;">
+                            {% if recipe.image_path %}
+                                <img src="{{ url_for('static', filename=recipe.image_path) }}" alt="图片" style="max-width:100%; max-height:100%; object-fit:cover;">
+                            {% else %}
+                                <i class="fas fa-utensils" style="font-size:48px; color:#ccc;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="recipe-info">
+                            <div class="recipe-title">{{ recipe.name }}</div>
+                            <div class="recipe-meta" style="margin-bottom:6px;">
+                                <span class="meta-item">
+                                    <i class="fas fa-tag"></i> {{ recipe.category }}
+                                </span>
+                            </div>
+                            <div class="info-content" style="color:var(--text-secondary); font-size:14px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ recipe.description }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align:center; color:var(--text-light); padding:40px 0;">
+                        <i class="fas fa-search" style="font-size:48px;"></i>
+                        <div style="margin-top:10px;">没有找到相关菜谱</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- 可选：底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="{{ url_for('index') }}" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="{{ url_for('discover') }}" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="{{ url_for('share') }}" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="{{ url_for('square') }}" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('.recipe-card').on('click', function() {
+                var url = $(this).data('url');
+                window.location.href = url;
+            });
+        });
+    </script>
+</body>
+</html>
