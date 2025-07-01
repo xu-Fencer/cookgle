@@ -36,15 +36,7 @@ def get_db_connection():
     获取 MySQL 连接（MySQL ≥ 8，默认开启 caching_sha2_password）
     如需使用 TLS，可在 connect() 中加入 ssl_ca / ssl_cert / ssl_key 等参数
     """
-    return mysql.connector.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        password="123456",
-        database="recipe1",
-        auth_plugin="caching_sha2_password",  # 明确指定插件，兼容较旧服务器
-        charset="utf8mb4",                    # 和 PyMySQL 保持一致
-    )
+    return mysql.connector.connect(**DB_CONFIG)
 
 # === API: /api/search_name ===
 @app.route("/api/search_name", methods=["GET"])
