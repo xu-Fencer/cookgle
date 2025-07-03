@@ -81,7 +81,7 @@
                     <div class="taste-name">半成品</div>
                 </div>
                 <div class="taste-item" data-category="饮品">
-                    <div class="taste-icon"><i class="fas fa-wine-glass-alt"></i></div>
+                    <div class="taste-icon"><i class="fas fa-wine-glass"></i></div>
                     <div class="taste-name">饮品</div>
                 </div>
                 
@@ -94,18 +94,16 @@
         <div class="feature-card">
             <div class="section-title">
                 <h2>智能推荐</h2>
-                <span class="action-link" id="refreshBtn">刷新</span>
+                <span class="action-link" id="refreshBtn" style="cursor:pointer;">刷新</span>
             </div>
             <div class="recommendations" id="recommendations">
                 <!-- 推荐内容将通过JavaScript动态生成 -->
             </div>
-            <div class="loader" id="loader">
-                <i class="fas fa-spinner"></i> 正在加载更多推荐...
-            </div>
-            <div class="status-indicator" id="statusIndicator">
-                已加载 <span id="loadedCount">0</span> 个推荐
+            <div class="loader" id="loader" style="display:none;">
+                <i class="fas fa-spinner fa-spin"></i> 正在加载更多推荐...
             </div>
         </div>
+        
         
     </div>
     
@@ -132,5 +130,105 @@
             <span>我的</span>
         </a>
     </div>
+ 
+    <script>
+        let isLoading = false;
+        let loadedRecipeIds = new Set();
+        
+        function renderRecommendations(recipes, append=false) {
+            let html = '';
+            if (recipes.length === 0 && !append) {
+                html = '<div style="text-align:center;color:#aaa;padding:32px 0;">暂无推荐</div>';
+                $('#recommendations').html(html);
+                return;
+            }
+            html = recipes.map(recipe => `
+                <div class="recipe-card" style="width:100%;max-width:420px;min-width:220px;cursor:pointer;margin-bottom:18px;" onclick="window.location.href='/recipe/${recipe.id}'">
+                    <div class="recipe-image" style="height:140px;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
+                        ${recipe.image_path ? `<img src="/static/${recipe.image_path}" alt="图片" style="max-width:100%;max-height:100%;object-fit:cover;">` : `<i class="fas fa-utensils" style="font-size:48px;color:#ccc;"></i>`}
+                    </div>
+                    <div class="recipe-info">
+                        <div class="recipe-title">${recipe.name}</div>
+                        <div class="recipe-meta" style="margin-bottom:6px;">
+                            <span class="meta-item">
+                                <i class="fas fa-tag"></i> ${recipe.category}
+                            </span>
+                        </div>
+                        <div class="info-content" style="color:var(--text-secondary);font-size:14px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                            ${recipe.description || ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (append) {
+                $('#recommendations').append(html);
+            } else {
+                $('#recommendations').html(html);
+            }
+        }
+        
+        function loadRecommendations(append=false) {
+            if (isLoading) return;
+            isLoading = true;
+            $('#loader').show();
+            // 传递已加载过的id，避免重复（可选，后端需支持）
+            $.get('/api/recommend_recipes?count=6', function(data) {
+                // 过滤已加载过的
+                let newRecipes = data.filter(r => !loadedRecipeIds.has(r.id));
+                newRecipes.forEach(r => loadedRecipeIds.add(r.id));
+                renderRecommendations(newRecipes, append);
+                $('#loader').hide();
+                isLoading = false;
+            });
+        }
+        
+        $(function() {
+            // 首次加载
+            loadedRecipeIds.clear();
+            loadRecommendations(false);
+        
+            // 刷新按钮
+            $('#refreshBtn').on('click', function() {
+                loadedRecipeIds.clear();
+                loadRecommendations(false);
+            });
+        
+            // 滚动到底部自动加载
+            $(window).on('scroll', function() {
+                if (isLoading) return;
+                let scrollTop = $(window).scrollTop();
+                let windowHeight = $(window).height();
+                let docHeight = $(document).height();
+                if (docHeight - (scrollTop + windowHeight) < 80) { // 距底部80px内
+                    loadRecommendations(true);
+                }
+            });
+        
+            // 分类点击跳转
+            $('.taste-item').on('click', function() {
+                var category = $(this).data('category');
+                if (category) {
+                    window.location.href = '/category/' + encodeURIComponent(category);
+                }
+            });
+            // 搜索框支持回车和点击
+            $('#search-input').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    var keyword = $(this).val().trim();
+                    if (keyword) {
+                        window.location.href = '/search?name=' + encodeURIComponent(keyword);
+                    }
+                }
+            });
+            $('#search-btn').on('click', function() {
+                var keyword = $('#search-input').val().trim();
+                if (keyword) {
+                    window.location.href = '/search?name=' + encodeURIComponent(keyword);
+                }
+            });
+        });
+        </script>
+        
+
 </body>
 </html>

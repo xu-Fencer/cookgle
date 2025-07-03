@@ -58,16 +58,16 @@
                 </div>
             </div>
             <!-- 点赞和收藏按钮 -->
-            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-                <button id="like-btn" class="action-btn {% if recipe.liked %}primary{% endif %}" style="display: flex; align-items: center; gap: 6px;margin-left: auto;margin-right: auto;">
-                    <i class="fa{{ 's' if recipe.liked else 'r' }} fa-thumbs-up"></i>
-                    <span id="like-count">{{ recipe.like_count }}</span>
-                    <span>点赞</span>
+            <div class="recipe-actions" style="margin:16px 0;">
+                <button id="likeBtn" class="action-btn" 
+                    style="margin-right:12px; {% if recipe.liked %}color:#e74c3c;{% endif %}">
+                    <i class="{% if recipe.liked %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                    <span id="likeCount">{{ recipe.like_count }}</span> 喜欢
                 </button>
-                <button id="collect-btn" class="action-btn {% if recipe.collected %}primary{% endif %}" style="display: flex; align-items: center; gap: 6px;margin-left: auto;margin-right: auto;">
-                    <i class="fa{{ 's' if recipe.collected else 'r' }} fa-bookmark"></i>
-                    <span id="collect-count">{{ recipe.collect_count }}</span>
-                    <span>收藏</span>
+                <button id="collectBtn" class="action-btn" 
+                    style="{% if recipe.collected %}color:#f39c12;{% endif %}">
+                    <i class="{% if recipe.collected %}fas fa-star{% else %}far fa-star{% endif %}"></i>
+                    <span id="collectCount">{{ recipe.collect_count }}</span> 收藏
                 </button>
             </div>
             <div class="recipe-info">
@@ -130,34 +130,73 @@
         </a>
     </div>
     <script>
-        // 点赞
-        $('#like-btn').click(function() {
-            var liked = $(this).hasClass('primary');
-            var count = parseInt($('#like-count').text());
-            if (liked) {
-                $(this).removeClass('primary');
-                $(this).find('i').removeClass('fas').addClass('far');
-                $('#like-count').text(count - 1);
-            } else {
-                $(this).addClass('primary');
-                $(this).find('i').removeClass('far').addClass('fas');
-                $('#like-count').text(count + 1);
-            }
+        function showToast(msg, duration=2000) {
+            var $toast = $('#toast');
+            $toast.text(msg).fadeIn(200);
+            setTimeout(function() {
+                $toast.fadeOut(400);
+            }, duration);
+        }
+        function updateLikeBtn(liked, count) {
+            $('#likeBtn').css('color', liked ? '#e74c3c' : '');
+            $('#likeBtn i').attr('class', liked ? 'fas fa-heart' : 'far fa-heart');
+            $('#likeCount').text(count);
+        }
+        function updateCollectBtn(collected, count) {
+            $('#collectBtn').css('color', collected ? '#f39c12' : '');
+            $('#collectBtn i').attr('class', collected ? 'fas fa-star' : 'far fa-star');
+            $('#collectCount').text(count);
+        }
+        $('#likeBtn').on('click', function() {
+            $.post('/api' + location.pathname + '/like')
+                .done(function(res) {
+                    let count = parseInt($('#likeCount').text());
+                    if (res.liked) count++;
+                    else count--;
+                    updateLikeBtn(res.liked, count);
+                })
+                .fail(function(xhr) {
+                    if (xhr.status === 401) {
+                        showToast('您未登录');
+                    } else {
+                        showToast('操作失败');
+                    }
+                });
         });
-        // 收藏
-        $('#collect-btn').click(function() {
-            var collected = $(this).hasClass('primary');
-            var count = parseInt($('#collect-count').text());
-            if (collected) {
-                $(this).removeClass('primary');
-                $(this).find('i').removeClass('fas').addClass('far');
-                $('#collect-count').text(count - 1);
-            } else {
-                $(this).addClass('primary');
-                $(this).find('i').removeClass('far').addClass('fas');
-                $('#collect-count').text(count + 1);
-            }
+        $('#collectBtn').on('click', function() {
+            $.post('/api' + location.pathname + '/collect')
+                .done(function(res) {
+                    let count = parseInt($('#collectCount').text());
+                    if (res.collected) count++;
+                    else count--;
+                    updateCollectBtn(res.collected, count);
+                })
+                .fail(function(xhr) {
+                    if (xhr.status === 401) {
+                        showToast('您未登录');
+                    } else {
+                        showToast('操作失败');
+                    }
+                });
         });
+        
+        
     </script>
+    <div id="toast" style="
+        display:none;
+        position:fixed;
+        top:50%; /* 改为上边距50%，以垂直方向作为起始点 */
+        left:50%; /* 左边距保持50%，作为水平方向的起始点 */
+        transform:translate(-50%, -50%); /* 调整此行，使其同时在两个方向上进行50%的位移补偿 */
+        background:rgba(0,0,0,0.85);
+        color:#fff;
+        padding:12px 28px;
+        border-radius:24px;
+        font-size:16px;
+        z-index:9999;
+        box-shadow:0 2px 8px rgba(0,0,0,0.15);
+        transition:opacity 0.3s;
+    "></div>
+
 </body>
 </html>

@@ -7,6 +7,7 @@ import markdown
 import mysql.connector
 from mysql.connector import Error
 from functools import wraps
+import random
 
 # ===== 加载 .env =====
 load_dotenv()              # 默认会在项目根目录寻找 .env
@@ -84,6 +85,7 @@ def recipe_detail(recipe_id):
     try:
         conn = get_db_connection()
         with conn.cursor(dictionary=True) as cur:
+            # 查询菜谱详情
             cur.execute(
                 "SELECT * FROM recipes1 WHERE id = %s",
                 (recipe_id,)
@@ -92,19 +94,32 @@ def recipe_detail(recipe_id):
         if not recipe:
             abort(404, description="菜谱不存在")
 
-        # markdown 字段转 html
+        # markdown 转 html
         for field in ['description', 'ingredients', 'steps', 'additional_notes']:
             value = recipe.get(field) or ''
             recipe[f"{field}_html"] = markdown.markdown(value, extensions=['extra', 'nl2br'])
 
-        # 假设点赞/收藏状态和数量也查出来了（这里用假数据演示）
-        recipe['liked'] = False  # 实际应查用户状态
+        # 查询点赞/收藏总数
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute("SELECT COUNT(*) AS cnt FROM recipe_likes WHERE recipe_id = %s", (recipe_id,))
+            recipe['like_count'] = cur.fetchone()['cnt']
+            cur.execute("SELECT COUNT(*) AS cnt FROM recipe_collections WHERE recipe_id = %s", (recipe_id,))
+            recipe['collect_count'] = cur.fetchone()['cnt']
+
+        # 查询当前用户是否点赞/收藏
+        user_id = session.get('user_id')
+        recipe['liked'] = False
         recipe['collected'] = False
-        recipe['like_count'] = 10  # 实际应查数据库
-        recipe['collect_count'] = 5
+        if user_id:
+            with conn.cursor(dictionary=True) as cur:
+                cur.execute("SELECT 1 FROM recipe_likes WHERE recipe_id = %s AND user_id = %s", (recipe_id, user_id))
+                recipe['liked'] = cur.fetchone() is not None
+                cur.execute("SELECT 1 FROM recipe_collections WHERE recipe_id = %s AND user_id = %s", (recipe_id, user_id))
+                recipe['collected'] = cur.fetchone() is not None
 
         return render_template('recipe_detail.html', recipe=recipe)
-    except Error as e:
+
+    except Exception as e:
         abort(500, description=f"数据库错误: {e}")
     finally:
         if conn and conn.is_connected():
@@ -272,6 +287,87 @@ def profile():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/api/recommend_recipes')
+def recommend_recipes():
+    count = int(request.args.get('count', 6))
+    conn = get_db_connection()
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            # 获取总数
+            cur.execute("SELECT COUNT(*) as total FROM recipes1")
+            total = cur.fetchone()['total']
+            # 随机选取id
+            cur.execute("SELECT id FROM recipes1")
+            all_ids = [row['id'] for row in cur.fetchall()]
+            random_ids = random.sample(all_ids, min(count, len(all_ids)))
+            # 查询随机菜谱
+            format_strings = ','.join(['%s'] * len(random_ids))
+            cur.execute(f"""
+                SELECT id, name, description, image_path, category
+                FROM recipes1
+                WHERE id IN ({format_strings})
+            """, tuple(random_ids))
+            recipes = cur.fetchall()
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return jsonify(recipes)
+
+def login_required_api(func):
+    from functools import wraps
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'msg': '请先登录'}), 401
+        return func(*args, **kwargs)
+    return wrapper
+
+@app.route('/api/recipe/<int:recipe_id>/like', methods=['POST'])
+@login_required_api
+def like_recipe(recipe_id):
+    user_id = session['user_id']
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            # 检查是否已点赞
+            cur.execute("SELECT 1 FROM recipe_likes WHERE user_id=%s AND recipe_id=%s", (user_id, recipe_id))
+            if cur.fetchone():
+                # 取消点赞
+                cur.execute("DELETE FROM recipe_likes WHERE user_id=%s AND recipe_id=%s", (user_id, recipe_id))
+                conn.commit()
+                return jsonify({'success': True, 'liked': False})
+            else:
+                # 点赞
+                cur.execute("INSERT INTO recipe_likes (user_id, recipe_id) VALUES (%s, %s)", (user_id, recipe_id))
+                conn.commit()
+                return jsonify({'success': True, 'liked': True})
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+
+@app.route('/api/recipe/<int:recipe_id>/collect', methods=['POST'])
+@login_required_api
+def collect_recipe(recipe_id):
+    user_id = session['user_id']
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            # 检查是否已收藏
+            cur.execute("SELECT 1 FROM recipe_collections WHERE user_id=%s AND recipe_id=%s", (user_id, recipe_id))
+            if cur.fetchone():
+                # 取消收藏
+                cur.execute("DELETE FROM recipe_collections WHERE user_id=%s AND recipe_id=%s", (user_id, recipe_id))
+                conn.commit()
+                return jsonify({'success': True, 'collected': False})
+            else:
+                # 收藏
+                cur.execute("INSERT INTO recipe_collections (user_id, recipe_id) VALUES (%s, %s)", (user_id, recipe_id))
+                conn.commit()
+                return jsonify({'success': True, 'collected': True})
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
 
 @app.route('/')
 def index():
