@@ -12,7 +12,7 @@
 
 在[Coze Learn文件](CozeLearn.md)中包含使用 Coze的相关信息
 
-API 文档在[apiDoc.md](apiDoc.md)中
+~~API 文档在[apiDoc.md](apiDoc.md)中~~这个文件没什么用了
 
 ## Todo list
 
@@ -20,12 +20,12 @@ API 文档在[apiDoc.md](apiDoc.md)中
 - [ ] 修改页面主体`container` css 属性以防止 web sdk将其挤开
 - [ ] （或）自制 coze 聊天页面
 - [x] 使用 Flask 制作后端接口连接数据库
-- [ ] 使用 Flask 制作后端接口连接 Coze 工作流
+- [ ] ~~使用 Flask 制作后端接口连接  Coze 工作流~~
 - [x] 添加 菜谱详情页面
 - [x] 添加 分类页面
 - [x] 添加 搜索结果页面
-- [ ] 支持 点赞
-- [ ] 添加 账号登陆系统
+- [x] 支持 点赞
+- [x] 添加 账号登陆系统
 
 
 ## 文件结构
@@ -38,9 +38,9 @@ public/static - css js img
 
 ## 技术栈
 
-（目前计划）使用 jQuery，~~PHP7.4~~，Flask，MySQL
+（目前计划）使用 jQuery，~~PHP7.4~~，Flask，MySQL，Nginx
 
-## 数据库表结构
+## 数据库表结构（详细请见代码）
 ```
 +--------------------+-----------+--------------------------+-------------+----------------+
 | COLUMN_NAME        | DATA_TYPE | CHARACTER_MAXIMUM_LENGTH | IS_NULLABLE | COLUMN_DEFAULT |
@@ -82,6 +82,10 @@ public/static - css js img
 | cook_time_minutes  | int       | NULL                     | YES         | NULL           |
 | total_time_minutes | int       | NULL                     | YES         | NULL           |
 | additional_notes   | text      | 65535                    | NO          | NULL           |
+
+
+
+
 
 ## 许可证
 
