@@ -1,10 +1,12 @@
-from flask import Flask, request, jsonify, render_template, abort
+from flask import Flask, request, jsonify, render_template, abort, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 from config import DevelopmentConfig
 from dotenv import load_dotenv
 import os
 import markdown
 import mysql.connector
 from mysql.connector import Error
+from functools import wraps
 
 # ===== 加载 .env =====
 load_dotenv()              # 默认会在项目根目录寻找 .env
@@ -170,6 +172,107 @@ def category_page(category):
 # def page_not_found(e):
 #     return render_template('404.html'), 404
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            error = "两次输入的密码不一致"
+        elif len(password) < 6:
+            error = "密码长度不能小于6位"
+        else:
+            conn = get_db_connection()
+            try:
+                with conn.cursor(dictionary=True) as cur:
+                    cur.execute("SELECT id FROM users WHERE username=%s OR email=%s", (username, email))
+                    if cur.fetchone():
+                        error = "用户名或邮箱已被注册"
+                    else:
+                        password_hash = generate_password_hash(password)
+                        cur.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                                    (username, email, password_hash))
+                        conn.commit()
+                        return redirect(url_for('login'))
+            finally:
+                if conn and conn.is_connected():
+                    conn.close()
+    return render_template('register.html', error=error)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username_or_email = request.form['username_or_email'].strip()
+        password = request.form['password']
+        conn = get_db_connection()
+        try:
+            with conn.cursor(dictionary=True) as cur:
+                cur.execute("SELECT * FROM users WHERE username=%s OR email=%s", (username_or_email, username_or_email))
+                user = cur.fetchone()
+                if user and check_password_hash(user['password_hash'], password):
+                    session['user_id'] = user['id']
+                    session['username'] = user['username']
+                    return redirect(url_for('profile'))  # 登录后跳转到个人中心
+                else:
+                    error = "用户名/邮箱或密码错误"
+        finally:
+            if conn and conn.is_connected():
+                conn.close()
+    return render_template('login.html', error=error)
+
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return view_func(*args, **kwargs)
+    return wrapper
+
+@app.route('/profile')
+@login_required
+def profile():
+    user_id = session['user_id']
+    conn = get_db_connection()
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            # 用户基本信息
+            cur.execute("SELECT id, username FROM users WHERE id=%s", (user_id,))
+            user = cur.fetchone()
+
+            # 最近发送的文章（最新5篇）
+            cur.execute("""
+                SELECT id, title, created_at
+                FROM articles
+                WHERE user_id=%s
+                ORDER BY created_at DESC
+                LIMIT 5
+            """, (user_id,))
+            articles = cur.fetchall()
+
+            # 收藏的菜谱（最新5个）
+            cur.execute("""
+                SELECT r.id, r.name, r.description, r.image_path, r.category, rc.collected_at
+                FROM recipe_collections rc
+                JOIN recipes1 r ON rc.recipe_id = r.id
+                WHERE rc.user_id=%s
+                ORDER BY rc.collected_at DESC
+                LIMIT 5
+            """, (user_id,))
+            collections = cur.fetchall()
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return render_template('profile.html', user=user, articles=articles, collections=collections)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -186,9 +289,6 @@ def share():
 def square():
     return render_template('square.html')
 
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
 
 @app.route('/camera')
 def camera():

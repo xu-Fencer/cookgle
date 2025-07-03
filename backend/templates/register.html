@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>注册 - 谷鸽社区</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<style>
+    /* 通用认证表单样式 */
+    .auth-form {
+        background: #fff;
+        padding: 32px 24px 24px 24px;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        max-width: 360px;
+        margin: 0 auto;
+    }
+    
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .auth-form label {
+        display: block;
+        font-size: 15px;
+        color: #333;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    
+    .auth-form .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        background: #fafbfc;
+        transition: border-color 0.2s;
+        outline: none;
+        box-sizing: border-box;
+    }
+    
+    .auth-form .form-control:focus {
+        border-color: #FF7043;
+        background: #fff;
+    }
+    
+    .auth-form .form-error {
+        color: #e74c3c;
+        background: #fff0f0;
+        border: 1px solid #ffd6d6;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    
+    .auth-form .action-btn.primary {
+        background: #FF7043;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 0;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 8px;
+    }
+    
+    .auth-form .action-btn.primary:hover {
+        background: #d05029;
+    }
+    
+</style>
+<body>
+    <div class="top-bar">
+        <a href="{{ url_for('index') }}" class="logo">
+            <div class="logo-icon">谷</div>
+            <div class="logo-text">谷鸽</div>
+        </a>
+    </div>
+    <div class="container" style="max-width:400px;margin:60px auto;">
+        <div class="feature-card">
+            <h2 style="text-align:center;">注册账号</h2>
+            <form method="post" action="{{ url_for('register') }}" class="auth-form">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" name="username" required maxlength="32" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" name="email" required maxlength="64" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" name="password" required minlength="6" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" name="confirm_password" required minlength="6" class="form-control">
+                </div>
+                {% if error %}
+                <div class="form-error" style="color:red;">{{ error }}</div>
+                {% endif %}
+                <button type="submit" class="action-btn primary" style="width:100%;">注册</button>
+            </form>
+            <div style="text-align:center;margin-top:10px;">
+                已有账号？<a href="{{ url_for('login') }}">去登录</a>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-nav">
+        <a href="{{ url_for('index') }}" class="nav-item">
+            <i class="nav-icon fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="{{ url_for('discover') }}" class="nav-item">
+            <i class="nav-icon fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="{{ url_for('share') }}" class="nav-item">
+            <i class="nav-icon fas fa-plus-circle"></i>
+            <span>分享</span>
+        </a>
+        <a href="{{ url_for('square') }}" class="nav-item">
+            <i class="nav-icon fas fa-heart"></i>
+            <span>广场</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item">
+            <i class="nav-icon fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+</body>
+</html>
