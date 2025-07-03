@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(32) NOT NULL UNIQUE,
-    password_hash VARCHAR(128) NOT NULL,
+    password_hash VARCHAR(162) NOT NULL,
     email VARCHAR(64) NOT NULL UNIQUE,
     avatar VARCHAR(255), -- 头像图片路径，可选
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
