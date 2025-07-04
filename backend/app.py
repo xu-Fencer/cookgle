@@ -375,7 +375,24 @@ def index():
 
 @app.route('/discover')
 def discover():
-    return render_template('discover.html')
+    conn = get_db_connection()
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute("""
+                SELECT r.id, r.name, r.description, r.image_path, r.category, 
+                       COUNT(l.id) AS like_count
+                FROM recipes1 r
+                LEFT JOIN recipe_likes l ON r.id = l.recipe_id
+                GROUP BY r.id
+                ORDER BY like_count DESC
+                LIMIT 10
+            """)
+            hot_recipes = cur.fetchall()
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return render_template('discover.html', hot_recipes=hot_recipes)
+
 
 @app.route('/share')
 def share():

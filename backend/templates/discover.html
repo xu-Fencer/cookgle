@@ -2,14 +2,25 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>谷鸽 - 发现菜谱</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <title>发现 - 谷鸽</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <style>
+    .section-title { margin: 24px 0 12px 0; font-size: 20px; font-weight: bold; }
+    .search-history-list { margin: 0; padding: 0; list-style: none; }
+    .search-history-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #555; cursor: pointer; }
+    .search-history-clear { color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 12px; }
+    .hot-recipe-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 16px 18px; margin-bottom: 18px; display: flex; align-items: center; }
+    .hot-recipe-img { width: 60px; height: 60px; border-radius: 8px; background: #f0f0f0; margin-right: 18px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .hot-recipe-img img { max-width: 100%; max-height: 100%; object-fit: cover; }
+    .hot-recipe-info { flex: 1; }
+    .hot-recipe-title { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 4px; }
+    .hot-recipe-desc { color: #666; font-size: 14px; margin-bottom: 4px; }
+    .hot-recipe-meta { color: #aaa; font-size: 13px; }
+    </style>
 </head>
 <body>
-    <!-- 发现页面容器 -->
     <div class="container">
         <!-- 顶部栏 -->
         <div class="top-bar">
@@ -19,8 +30,8 @@
             </a>
             <div class="page-title">发现</div>
         </div>
-        
-        <!-- 搜索框区域 -->
+
+        <!-- 搜索区域（与首页一致） -->
         <div class="search-section">
             <div class="search-box">
                 <div class="search-icon" id="search-btn" style="cursor:pointer;">
@@ -29,233 +40,54 @@
                 <input type="text" id="search-input" placeholder="搜索菜谱、食材或厨师...">
             </div>
         </div>
-        
-        <!-- 历史记录 -->
-        <div class="section-title">
-            <span>历史记录</span>
-            <span class="clear-history">清空</span>
+
+        <!-- 搜索历史 -->
+        <div class="feature-card">
+            <div class="section-title">
+                搜索历史
+                <span class="search-history-clear" id="clear-history">清空</span>
+            </div>
+            <ul class="search-history-list" id="search-history-list">
+                <!-- 由JS动态填充 -->
+            </ul>
         </div>
-        <div class="history-container">
-            <div class="history-item animate delay-1">
-                <div class="history-text">
-                    <i class="history-icon fas fa-search"></i>
-                    <span>川菜家常菜做法</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="history-item animate delay-2">
-                <div class="history-text">
-                    <i class="history-icon fas fa-search"></i>
-                    <span>低卡减脂餐</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="history-item animate delay-1">
-                <div class="history-text">
-                    <i class="history-icon fas fa-utensils"></i>
-                    <span>宫保鸡丁菜谱</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="history-item animate">
-                <div class="history-text">
-                    <i class="history-icon fas fa-book"></i>
-                    <span>烘焙新手教程</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="history-item animate delay-2">
-                <div class="history-text">
-                    <i class="history-icon fas fa-fire"></i>
-                    <span>低热量高蛋白</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="history-item animate delay-3">
-                <div class="history-text">
-                    <i class="history-icon fas fa-leaf"></i>
-                    <span>素食菜谱大全</span>
-                </div>
-                <div class="delete-btn">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-        </div>
-        
-        <!-- TOP10热门菜谱 -->
-        <div class="section-title">
-            <span>热门菜谱TOP10</span>
-        </div>
-        <div class="top-list">
-            <!-- TOP1 -->
-            <div class="recipe-item rank-1 animate">
-                <div class="rank-number">1</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">麻辣香锅（家常版）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 125.8K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 423kcal</div>
+
+        <!-- 热门菜谱 -->
+        <div class="feature-card">
+            <div class="section-title">热门菜谱</div>
+            {% if hot_recipes %}
+                {% for recipe in hot_recipes %}
+                <div class="hot-recipe-card" onclick="window.location.href='{{ url_for('recipe_detail', recipe_id=recipe.id) }}'">
+                    <div class="hot-recipe-img">
+                        {% if recipe.image_path %}
+                            <img src="{{ url_for('static', filename=recipe.image_path) }}" alt="图片">
+                        {% else %}
+                            <i class="fas fa-utensils" style="font-size:32px;color:#ccc;"></i>
+                        {% endif %}
                     </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 98%"></div>
+                    <div class="hot-recipe-info">
+                        <div class="hot-recipe-title">{{ recipe.name }}</div>
+                        <div class="hot-recipe-desc">{{ recipe.description|truncate(40) }}</div>
+                        <div class="hot-recipe-meta">
+                            <i class="fas fa-heart" style="color:#e74c3c;"></i> {{ recipe.like_count }} &nbsp;
+                            <span style="color:#888;">{{ recipe.category }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- TOP2 -->
-            <div class="recipe-item rank-2 animate delay-1">
-                <div class="rank-number">2</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">糖醋排骨（入口即化）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 98.4K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 518kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 95%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP3 -->
-            <div class="recipe-item rank-3 animate delay-2">
-                <div class="rank-number">3</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">酸菜鱼（家庭简易版）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 89.2K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 325kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 92%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP4 -->
-            <div class="recipe-item animate">
-                <div class="rank-number">4</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">西红柿鸡蛋面（10分钟快手菜）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 85.7K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 295kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 89%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP5 -->
-            <div class="recipe-item animate delay-1">
-                <div class="rank-number">5</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">红烧肉（不油腻秘诀）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 81.3K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 568kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 85%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP6 -->
-            <div class="recipe-item animate delay-2">
-                <div class="rank-number">6</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">蒜蓉粉丝蒸扇贝</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 76.5K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 320kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 80%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP7 -->
-            <div class="recipe-item animate">
-                <div class="rank-number">7</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">照烧鸡排饭（自制照烧汁）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 72.8K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 450kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 77%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP8 -->
-            <div class="recipe-item animate delay-1">
-                <div class="rank-number">8</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">土豆炖牛腩（软烂秘诀）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 68.1K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 380kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 73%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP9 -->
-            <div class="recipe-item animate delay-2">
-                <div class="rank-number">9</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">减脂蔬菜沙拉（7天不重样）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 63.9K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 220kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 68%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TOP10 -->
-            <div class="recipe-item animate">
-                <div class="rank-number">10</div>
-                <div class="recipe-info">
-                    <div class="recipe-title">奶香蘑菇汤（西餐厅风味）</div>
-                    <div class="recipe-meta">
-                        <div class="meta-item"><i class="fas fa-eye"></i> 59.4K浏览</div>
-                        <div class="meta-item"><i class="fas fa-fire"></i> 210kcal</div>
-                    </div>
-                    <div class="heat-indicator">
-                        <div class="heat-bar" style="width: 65%"></div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <div style="color:#aaa;text-align:center;padding:32px 0;">暂无热门菜谱</div>
+            {% endif %}
         </div>
     </div>
-    
+
     <!-- 底部导航栏 -->
     <div class="bottom-nav">
         <a href="{{ url_for('index') }}" class="nav-item">
             <i class="nav-icon fas fa-home"></i>
             <span>首页</span>
         </a>
-        <a href="{{ url_for('discover') }}" class="nav-item">
+        <a href="{{ url_for('discover') }}" class="nav-item active">
             <i class="nav-icon fas fa-search"></i>
             <span>发现</span>
         </a>
@@ -272,7 +104,67 @@
             <span>我的</span>
         </a>
     </div>
-    <script src="{{ url_for('static', filename='js/discover.js')}}"></script>
 
+    <script>
+    // 搜索历史本地存储
+    function getHistory() {
+        let h = localStorage.getItem('search_history');
+        return h ? JSON.parse(h) : [];
+    }
+    function setHistory(arr) {
+        localStorage.setItem('search_history', JSON.stringify(arr));
+    }
+    function renderHistory() {
+        let arr = getHistory();
+        let $list = $('#search-history-list');
+        $list.empty();
+        if (arr.length === 0) {
+            $list.append('<li style="color:#aaa;padding:16px 0;text-align:center;">暂无搜索历史</li>');
+        } else {
+            arr.slice(0, 10).forEach(function(item) {
+                $list.append('<li class="search-history-item">'+item+'</li>');
+            });
+        }
+    }
+    // 搜索框交互
+    $('#search-input').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            let keyword = $(this).val().trim();
+            if (keyword) {
+                let arr = getHistory();
+                arr = arr.filter(x => x !== keyword);
+                arr.unshift(keyword);
+                if (arr.length > 20) arr = arr.slice(0, 20);
+                setHistory(arr);
+                window.location.href = '/search?name=' + encodeURIComponent(keyword);
+            }
+        }
+    });
+    $('#search-btn').on('click', function() {
+        let keyword = $('#search-input').val().trim();
+        if (keyword) {
+            let arr = getHistory();
+            arr = arr.filter(x => x !== keyword);
+            arr.unshift(keyword);
+            if (arr.length > 20) arr = arr.slice(0, 20);
+            setHistory(arr);
+            window.location.href = '/search?name=' + encodeURIComponent(keyword);
+        }
+    });
+    // 点击历史项直接搜索
+    $(document).on('click', '.search-history-item', function() {
+        let keyword = $(this).text();
+        window.location.href = '/search?name=' + encodeURIComponent(keyword);
+    });
+    // 清空历史
+    $('#clear-history').on('click', function() {
+        setHistory([]);
+        renderHistory();
+    });
+    // 初始化
+    $(function() {
+        renderHistory();
+    });
+    </script>
 </body>
 </html>
