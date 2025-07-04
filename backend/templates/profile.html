@@ -111,10 +111,10 @@
             <div class="profile-uid">UID: {{ user.id }}</div>
         </div>
         <div class="profile-tabs">
-            <div class="profile-tab active" data-tab="articles">我的文章</div>
-            <div class="profile-tab" data-tab="collections">收藏的菜谱</div>
+            <!-- <div class="profile-tab active" data-tab="articles">我的文章</div> -->
+            <div class="profile-tab active" data-tab="collections">收藏的菜谱</div>
         </div>
-        <div class="tab-pane active" id="articles">
+        <div class="tab-pane" id="articles">
             {% if articles %}
                 {% for article in articles %}
                 <div class="article-item">
@@ -132,7 +132,7 @@
                 <div style="color:#aaa;text-align:center;padding:32px 0;">暂无文章</div>
             {% endif %}
         </div>
-        <div class="tab-pane" id="collections">
+        <div class="tab-pane active" id="collections">
             {% if collections %}
                 {% for recipe in collections %}
                 <div class="collection-item">
