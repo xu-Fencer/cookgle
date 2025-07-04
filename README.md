@@ -83,6 +83,16 @@ public/static - css js img
 | total_time_minutes | int       | NULL                     | YES         | NULL           |
 | additional_notes   | text      | 65535                    | NO          | NULL           |
 
+## 截图
+|首页|分类页面|详情页面|
+|:---:|:---:|:---:|
+|![首页](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232746081.png)|![分类页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232804895.png)|![详情页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232827190.png)|
+|发现页面|搜索页面|我的页面|
+|![发现页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232844266.png)|![搜索页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232857756.png)|![我的页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232912405.png)|
+|登陆页面|注册页面| |
+|![登陆页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232927265.png)|![注册页面](https://cdn.jsdelivr.net/gh/xu-Fencer/ppiipp/002/20250704232937599.png)| |
+
+
 
 
 
