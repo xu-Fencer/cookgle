@@ -10,7 +10,7 @@
 
 前端使用AI编写的代码，参考某同学设计的 UI。后端（目前计划）使用 Flask 与 mysql 数据库。通过 API或 Web SDK 连接 [Coze](https://www.coze.com/)，~~通过 Coze 设计工作流，此项目仅包含前后端，（目前计划）不对 Coze 工作流进行记录。~~
 
-在[Coze Learn文件](CozeLearn.md)中包含使用 Coze的相关信息
+在[Coze Learn文件](CozeLearn.md)中包含使用 Coze的相关信息。这个文件也没用
 
 ~~API 文档在[apiDoc.md](apiDoc.md)中~~这个文件没什么用了
 
@@ -27,11 +27,18 @@
 - [x] 支持 点赞
 - [x] 添加 账号登陆系统
 
+## 运行方式 
+需要python 3.11.13环境（其他版本没试过），以及安装mysql
+1. 修改`.env`文件配置环境
+2. 启动
+```bash
+pip install -r requirements.txt
+python backend/app.py
+```
 
 ## 文件结构
 
 ```
-public - 前端页面文件
 backend - 后端文件
 public/static - css js img
 ```
